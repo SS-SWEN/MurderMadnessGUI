@@ -1,0 +1,62 @@
+class Cluedo{
+  
+  GameState{
+    
+    PlayerTurn{
+      entry/ { report("Next players Turn"); }
+      [playerInGame] nextPlayer -> Move;
+    }
+    
+    Move{
+      move/ {report("Moving Player");} -> Move;
+      [inEstate] moveToEstate -> inRoom;
+    }
+    
+    inRoom{
+      entry/{ report("Player now in an Estate"); }
+      guessing /{ report("Choose Cards: "); } -> Guess;
+      [solutionExists] accusing / {report("Choose solution: ")} -> Accuse;
+    }
+    
+    Action{
+      nextPlayer/ {report("Next players turn");} -> PlayerTurn;
+      
+      Guess{
+        chooseCards/ {report("Choose Guess");} -> Refute;
+      }
+      
+      
+      Refute{
+        [hasRefutation] refuted -> PlayerTurn;
+      }
+      
+      Accuse{
+        [correct] -> Won;
+        [incorrect] -> Lost;
+      }
+    }
+    
+    
+    Won{
+      entry/{report("Player has won game!");}
+    }
+    
+    Lost{
+      entry/{report("Player has lost the game");}
+      [gameOngoing] -> PlayerTurn;
+    }
+  }
+}//$?[End_of_model]$?
+
+namespace -;
+
+
+class Cluedo
+{
+  position 50 30 109 45;
+}
+
+class Cluedo
+{
+  position 50 30 109 45;
+}
