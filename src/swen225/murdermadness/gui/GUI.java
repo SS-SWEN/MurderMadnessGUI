@@ -12,7 +12,7 @@ import javax.swing.text.DefaultCaret;
 
 
 
-public class GUI {  
+public class GUI implements Runnable{  
 
 	private JFrame frame;
 	private JPanel controls;
@@ -24,34 +24,75 @@ public class GUI {
 	private static final int DEFAULT_DRAWING_WIDTH = 600;
 	public static final int BOARD_WIDTH = 24, BOARD_HEIGHT = 20;
 	private static final int TEXT_OUTPUT_ROWS = 5;
+	
+	int x = 0;
+	int y = 0;
+	int z = 0;
 	public static Color BACKGROUND_COLOR = new Color(120, 116, 119);
-	public static Color dice = new Color(0, 0, 0);
+	public static Color dice;
 	
 	private static final int BUFFER_SIZE = 10;
 	
-	public static String diceRoll = "1";
-	public static String dice1 = "1";
-	public static String dice2 = "1";
+	public static String diceRoll = "";
+	public static String dice1 = "";
+	public static String dice2 = "";
+	
+	
+	public void update(){
+		int m = 5;
+		int r1 = (int) (Math.random()*m);
+		int r2 = (int) (Math.random()*m);
+		int r3 = (int) (Math.random()*m);
+		if(this.x>250) {
+			x=0;
+		}
+		if(this.y>250) {
+			y=0;
+		}
+		if(this.z>250) {
+			z=0;
+		}
+		this.x+=r1;
+		this.y+=r2;
+		this.z+=r3;
+		
+		
+	}
+	
+	@Override
+    public void run() {
+        while (true){
+            update();
+            redraw();
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+	
+	
+	
 
 	protected void redraw(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setColor(BACKGROUND_COLOR);
+		
+	
+		g2d.setColor(BACKGROUND_COLOR);//colour of the entire drawing space
 		g2d.fillRect(0,0 , DEFAULT_DRAWING_WIDTH, DEFAULT_DRAWING_HEIGHT);
-		
-		
 		g2d.setFont(new Font("TimesRoman", Font.PLAIN, 25));
 		g2d.setColor(dice);
 		
+		dice = new Color(x, y, z);
 			switch (diceRoll) {
 			case "null":
 				break;
 			case "-1":
 				break;
 			default:
-
 				g2d.drawString(diceRoll, BOARD_WIDTH * 13 - BUFFER_SIZE / 4,
 						BOARD_HEIGHT * 13);
-
 				switch (dice1) {
 				case "1":
 					g2d.fillOval(BOARD_WIDTH * 13 - BUFFER_SIZE / 4, BOARD_HEIGHT * 10 + BUFFER_SIZE / 4,
@@ -173,18 +214,13 @@ public class GUI {
 		}
 		
 		
-	
-
 	public void redraw() {
 		frame.repaint();
 	}
-	
-	
 
 	GUI () {
 		initialise();
 	}
-	
 	
 	/**
      * Rolls the two dice and sets the players remaining steps
@@ -206,6 +242,7 @@ public class GUI {
         	JButton accuse = new JButton("accuse");
     		accuse.addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent ev) {
+    				
     				
 
     			}
@@ -244,6 +281,8 @@ public class GUI {
 
     			}
     		});
+    		
+    		
 
     		
     		// roll button
@@ -372,5 +411,11 @@ public class GUI {
 		public static void main(String args[])  
         {  
          new GUI();
-        }  
+         Thread t1 = new Thread(new GUI());
+         t1.start();
+         
+        }
+
+
+		 
     }
