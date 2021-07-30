@@ -1,6 +1,7 @@
 package swen225.murdermadness;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.*;
-
 
 import swen225.murdermadness.cards.*;
 import swen225.murdermadness.view.Position;
@@ -16,8 +17,9 @@ public class Player {
 	private Position pos;
 	private List<Position> prevPositions;
     private int stepsRemaining = 0;
-	
     private Estate estate;
+    
+    private BufferedImage playerIcon;
     
     public Estate getEstate() {
     	return this.estate;
@@ -167,6 +169,12 @@ public class Player {
     	this.pos = nextPos;
     }
     
-	
+    public void setImg(BufferedImage img) {
+    	this.playerIcon = img;
+    }
+    
+	public void redraw(Graphics g) {
+		g.drawImage(playerIcon, 50, 50, null);
+	}
 
 }

@@ -1,8 +1,9 @@
 package swen225.murdermadness;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-
-
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -18,12 +19,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.xml.stream.events.Characters;
+import javax.imageio.ImageIO;
 
 import swen225.murdermadness.cards.Card;
 import swen225.murdermadness.cards.CharacterCard;
 import swen225.murdermadness.cards.EstateCard;
 import swen225.murdermadness.cards.WeaponCard;
+import swen225.murdermadness.gui.GUI;
 import swen225.murdermadness.view.*;
 
 /*
@@ -43,32 +45,36 @@ public class MurderMadness {
 	
 	private boolean isOngoing;
 	public static enum Direction {UP, RIGHT, DOWN, LEFT}
-	private static int numPlayers = 0; // this can be minimum 3 max of 6
 	
 	private static Board board;
+	private static GUI view;
+	
 	private Set<Card> murderSolution;
 	private Map<String, Card> allCards;
 	private List<Player> players;
 	
     public MurderMadness() {
     	isOngoing = true;
-    	// Ask user preliminary information
-    	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    	System.out.println("How many players?");
-    	try { 
-    		while(true) {
-    			numPlayers = Integer.parseInt(input.readLine());
-    			if(numPlayers == 4 || numPlayers == 3) { break; }
-    			else {
-    				System.out.println("Invalid number of players; Please input between 3-4.");
-    			}
-    		}
-    		setup();
-    		initializeCards();
-    		runGame(numPlayers);
-    		input.close(); 
-    	} 
-    	catch (IOException e) { e.printStackTrace(); }
+    	board = new Board(this);
+    	view = new GUI(this);
+    }
+    
+    /**
+     * Setup the initial game (Players, Board and Cards)
+     */
+    public void setup(List<String> playerList) {
+    	if (playerList.isEmpty()) return;
+    	view.initMainGUI();
+    	players = new ArrayList<Player>();
+    	for (String s: playerList) {
+    		Player p = new Player(s);
+    		players.add(p);
+    		try {
+    			BufferedImage img = ImageIO.read(new File("assets/player-placeholder.png"));
+    			p.setImg(img);
+    		} catch (Exception e) {e.printStackTrace();}
+    	}
+    	board.show(view.getGraphics());
     }
     
     /**
@@ -78,7 +84,6 @@ public class MurderMadness {
     	System.out.println("==============================================================");
     	System.out.println("A Game of MurderMadness has just started: "+numPlayers+" players");
     	System.out.println("==============================================================");
-    	board = new Board();
   
     	List<String> availableCharacters = new ArrayList<>();
     	for (Player p : players) {
@@ -141,7 +146,7 @@ public class MurderMadness {
      */
     private void onPlayerMove(Player player) {
     	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    	board.show();
+    	board.show(view.getGraphics());
     	System.out.println("==============================================================");
     	System.out.println(player.getName()+"'s Turn");
     	System.out.println("Hand: "+player.getHand()+" Eliminations: "+player.getEliminations());
@@ -235,48 +240,6 @@ public class MurderMadness {
     	}
     	}
     	board.removeTrail(player);
-    }
-    
-    /**
-     * Setup the initial game (Players, Board and Cards)
-     */
-    private void setup() {
-    	List<String> remainingChars = new ArrayList<String>();
-    	remainingChars.addAll(characterNames);
-
-    	// Initialize Players, players can input which characters they wish to play as
-    	players = new ArrayList<Player>();
-    	for (int i = 0; i < numPlayers; i++) {
-    		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    		try {
-				System.out.println("-------------------------------------------------------------");
-				System.out.println("Player "+(i+1)+": CHOOSE YOUR CHARACTER");
-	    		System.out.println(remainingChars);
-	    		while(true) {
-	    			boolean found = false;
-	    			String inName = input.readLine().trim();
-		    		for(String name : remainingChars){
-		    			
-		    			if(inName.equalsIgnoreCase(name)){
-		    				Player p = new Player(name);
-		    				players.add(p);
-		    				remainingChars.remove(name);
-		    				found = true;
-		    				break;
-		    			}
-		    		}
-		    		if(found) { break; }
-		    		else {
-		    			System.out.println("Invalid character name, please choose a character from the list!");
-			    		System.out.println("-------------------------------------------------------------");
-		    		}
-    			}
-    		} catch(Exception e) {
-    			System.out.println("Invalid Input: "+e.getMessage());
-    			continue;
-        	}
-    		
-    	}
     }
     
     /*
@@ -499,7 +462,7 @@ public class MurderMadness {
 	    		}
 	    		
 	    		//redraw the board with moved weapon/character
-	    		board.show();
+	    		board.show(view.getGraphics());
 
 	    		// Check if a player can refute the guess
 	    		Card refutedCard = null;
@@ -563,6 +526,9 @@ public class MurderMadness {
     	}
     }
    
+    public List<Player> getPlayers() {
+    	return Collections.unmodifiableList(this.players);
+    }
     
 	public static void main(String[] args) {
 		new MurderMadness();

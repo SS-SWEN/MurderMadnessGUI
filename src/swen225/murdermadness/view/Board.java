@@ -3,13 +3,18 @@ package swen225.murdermadness.view;
 import swen225.murdermadness.MurderMadness.Direction;
 import swen225.murdermadness.cards.CharacterCard;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
 import swen225.murdermadness.Estate;
+import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.Player;
 
 public class Board {
+	
+	private MurderMadness model;
 	
 	List<Tile> hauntedHouse = new ArrayList<Tile>();
     List<Tile> manicManor = new ArrayList<Tile>();
@@ -47,21 +52,26 @@ public class Board {
 	/**
 	 * Redraws the board onto the console
 	 */
-	public void show() {		
+	public void show(Graphics2D g) {		
 		for (int y = 0; y <= 23; y++) {
 			for (int x = 0; x <= 23; x++) {
 				System.out.print(" ");
 				System.out.print(this.board[x][y].getCharacter());
 				System.out.print(" ");
 			}
-			System.out.println();
+		}
+		
+
+		for (Player p: model.getPlayers()) {
+			p.redraw(g);
 		}
 	}
 	
 	/**
 	 * Construct initial board.
 	 */
-	public Board() {
+	public Board(MurderMadness model) {
+		this.model = model;
 		this.board = new Tile[24][24]; //changed to 24 from 23 
 		layout = layout.replaceAll(" ", "");
 		layout = layout.replaceAll("o", " ");
@@ -288,7 +298,6 @@ public class Board {
 	    	player.updateLocation(next.getPos());
 	    	player.decrementStep();
     	}
-    	this.show();
     	return true;
 	}
     
