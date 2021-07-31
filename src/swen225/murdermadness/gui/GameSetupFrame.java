@@ -1,6 +1,7 @@
 package swen225.murdermadness.gui;
 
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -32,12 +33,24 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("SETUP");
 		this.setResizable(false);
-		this.setSize(300,130);
+		this.setSize(300,160);
 		this.setLocationRelativeTo(null);
 		
 		JLabel welcomeMsg = new JLabel("Welcome to MurderMadness!");
+		welcomeMsg.setFont(new Font("SansSerif", Font.BOLD, 20));
 		
-		String[] options = {"One Player","Two Players","Three Players","Four Players"};
+		JLabel promptMsg = new JLabel("How many players would like to play?");
+		promptMsg.setFont(new Font("SansSerif", Font.ITALIC, 16));
+		
+		JButton helpBtn = new JButton("Help");
+		helpBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO: Help screen showing instructions.
+			}
+		});
+		
+		String[] options = {"2 Players","3 Players","4 Players"};
 		JComboBox playerCount = new JComboBox(options);
 		
 		JButton confirmBtn = new JButton("Continue");
@@ -50,8 +63,11 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 			}
 		});
 		
+		// Add Components to this Frame
 		this.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 		this.add(welcomeMsg);
+		this.add(promptMsg);
+		this.add(helpBtn);
 		this.add(playerCount);
 		this.add(confirmBtn);
 		this.setVisible(true);
@@ -64,7 +80,7 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 	private JRadioButton percyChar;
 	
 	public void initCharSelection() {
-		count = 1;
+		count = 0;
 		newPlayers = new ArrayList<String>();
 		
 		this.setVisible(false);
@@ -73,7 +89,8 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 		this.setTitle("Character Selection: Player 1");
 		
 		// Create CharacterCard Radio Options
-		ImageIcon lucillaImg = new ImageIcon("assets/card-placeholder.png");
+		// TODO: Images could potentially be a static global, so Player Classes can make reference to the images.
+		ImageIcon lucillaImg = new ImageIcon("assets/card-placeholder.png"); 
 		lucillaChar = new JRadioButton();
 		lucillaChar.addActionListener(this);
 		lucillaChar.setIcon(lucillaImg);

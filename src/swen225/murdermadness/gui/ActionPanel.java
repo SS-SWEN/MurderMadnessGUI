@@ -1,5 +1,6 @@
 package swen225.murdermadness.gui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -12,7 +13,10 @@ import swen225.murdermadness.MurderMadness;
 
 public class ActionPanel extends JPanel {
 
-	public ActionPanel() {
+	private GUI view;
+	
+	public ActionPanel(GUI view) {
+		this.view = view;
 		initialise();
 	}
 	
@@ -23,7 +27,7 @@ public class ActionPanel extends JPanel {
 		accuse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {	
-
+				
 			}
 		});
 		accuse.setEnabled(false);
@@ -72,8 +76,8 @@ public class ActionPanel extends JPanel {
 		JButton roll = new JButton("Roll");
 		roll.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(ActionEvent ev) {
+				view.roll();
 			}
 		});
 
@@ -82,9 +86,10 @@ public class ActionPanel extends JPanel {
 		hand.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				
+
 			}
 		});
+
 		
 		this.setMaximumSize(new Dimension(150, 60));
 		this.setLayout(new GridLayout(2, 4));

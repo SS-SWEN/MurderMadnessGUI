@@ -70,18 +70,37 @@ public class MurderMadness {
     		Player p = new Player(s);
     		players.add(p);
     		try {
-    			BufferedImage img = ImageIO.read(new File("assets/player-placeholder.png"));
+    			BufferedImage img = grabAsset("assets/player-placeholder.png");
     			p.setImg(img);
     		} catch (Exception e) {e.printStackTrace();}
     	}
-    	board.show(view.getGraphics());
     }
     
     /*
-     * Redraws the Board on the GUI
+     * Redraws the Board
      */
     public void updateBoard(Graphics2D g) {
     	board.show(g);
+    }
+    
+    /*
+     * Redraws userHUD
+     */
+    
+    public void updateHUD(Graphics2D g) {
+    	// TODO: Temporary Test
+
+    }
+    
+    /*
+     * Helper Method to grab assets
+     */
+    public BufferedImage grabAsset(String path) {
+		try {
+			BufferedImage img = ImageIO.read(new File(path));
+			return img;
+		} catch (Exception e) {e.printStackTrace();}
+		return null;
     }
     
     /**

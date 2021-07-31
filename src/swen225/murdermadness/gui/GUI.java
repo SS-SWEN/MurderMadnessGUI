@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -22,16 +23,16 @@ public class GUI {
 	private GameSetupFrame setupFrame;
 	
 	private JFrame frame;
-	private JPanel controls;
-	private JPanel drawing;
+	private ActionPanel controls;
 	
-	//private JLabel
+	private JPanel drawing;
+	private JPanel userHUD;
 
 	private static final int DFLT_GUI_WIDTH = 900;
-	private static final int DFLT_GUI_HEIGHT = 780;
+	private static final int DFLT_GUI_HEIGHT = 840;
 	
 	private static final int DFLT_DRAWING_WIDTH = 700;
-	private static final int DFLT_DRAWING_HEIGHT = 540;
+	private static final int DFLT_DRAWING_HEIGHT = 600;
 	
 	private static Color BACKGROUND_COLOR = new Color(120, 116, 119);
 	
@@ -44,7 +45,7 @@ public class GUI {
     public void initMainGUI() {
 
     	// Action Buttons 
-    	ActionPanel actionPanel = new ActionPanel();
+    	ActionPanel actionPanel = new ActionPanel(this);
     	
 		JLabel actionLabel = new JLabel();
 		actionLabel.setText("Lucilla's Turn");
@@ -54,7 +55,7 @@ public class GUI {
 		eliminationLabel.setText("Elimination Sheet");
 		eliminationLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		
-    	controls = new JPanel();
+		JPanel controls = new JPanel();
     	controls.setLayout(new BoxLayout(controls, BoxLayout.LINE_AXIS));
 
     	Border edge = BorderFactory.createEmptyBorder(5, 5, 5, 5);
@@ -74,7 +75,7 @@ public class GUI {
     	topPanel.setLeftComponent(controls);
     	topPanel.setRightComponent(labels);
 
-    	// Graphics Pane
+    	// Inner Board Graphics Pane
     	drawing = new JPanel() {
     		@Override
     		public void paintComponent(Graphics g) {
@@ -84,9 +85,19 @@ public class GUI {
     	};
     	drawing.setPreferredSize(new Dimension(DFLT_DRAWING_WIDTH,DFLT_DRAWING_HEIGHT));
 	
+    	// Inner UserHud Graphics Pane
+    	userHUD = new JPanel() {
+    		@Override
+    		public void paintComponent(Graphics g) {
+    			Graphics2D g2d = (Graphics2D) g;
+    			model.updateHUD(g2d);
+    		}
+    	};
+    	
     	JSplitPane innerPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     	innerPanel.setEnabled(false);
     	innerPanel.setTopComponent(drawing);
+    	innerPanel.setBottomComponent(userHUD);
 
     	JPanel rightPanel = new JPanel();
     	rightPanel.setBackground(BACKGROUND_COLOR);
@@ -151,18 +162,25 @@ public class GUI {
 	}
     
     /*
+     * Rolls the dice
+     */
+    public void roll() {
+    	Animate.rollDice();
+    	Graphics2D g = (Graphics2D)this.userHUD.getGraphics();
+    	// Start Drawing the dice - Temporary of course
+    	BufferedImage img = model.grabAsset("assets/dice-placeholder.jpg");
+    	g.drawImage(img, 0, 0, 100, 100, null);
+    	
+    }
+    
+    /*
      * Get drawing pane of the main GUI;
      */
     public Graphics2D getGraphics() {
     	return (Graphics2D)this.drawing.getGraphics();
     }
     
-    public void updateState() {
-    	this.frame.repaint();
+    public JPanel getControls() {
+    	return this.controls;
     }
-    
-    public int getDefaultWidth() {
-    	return 0;
-    }
-    
 }
