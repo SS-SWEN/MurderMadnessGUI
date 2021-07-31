@@ -77,6 +77,13 @@ public class MurderMadness {
     	board.show(view.getGraphics());
     }
     
+    /*
+     * Redraws the Board on the GUI
+     */
+    public void updateBoard(Graphics2D g) {
+    	board.show(g);
+    }
+    
     /**
      * Run the game
      */

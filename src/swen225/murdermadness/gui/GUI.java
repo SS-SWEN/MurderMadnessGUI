@@ -79,7 +79,7 @@ public class GUI {
     		@Override
     		public void paintComponent(Graphics g) {
     			Graphics2D g2d = (Graphics2D) g;
-    			
+    			model.updateBoard(g2d);
     		}
     	};
     	drawing.setPreferredSize(new Dimension(DFLT_DRAWING_WIDTH,DFLT_DRAWING_HEIGHT));
@@ -159,6 +159,10 @@ public class GUI {
     
     public void updateState() {
     	this.frame.repaint();
+    }
+    
+    public int getDefaultWidth() {
+    	return 0;
     }
     
 }

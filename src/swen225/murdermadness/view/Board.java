@@ -55,16 +55,15 @@ public class Board {
 	public void show(Graphics2D g) {		
 		for (int y = 0; y <= 23; y++) {
 			for (int x = 0; x <= 23; x++) {
-				System.out.print(" ");
-				System.out.print(this.board[x][y].getCharacter());
-				System.out.print(" ");
+				this.board[x][y].redraw(g);
 			}
 		}
 		
-
+		/*
 		for (Player p: model.getPlayers()) {
 			p.redraw(g);
 		}
+		*/
 	}
 	
 	/**

@@ -1,5 +1,9 @@
 package swen225.murdermadness.view;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+
 import swen225.murdermadness.Player;
 
 public class NormalTile implements Tile{
@@ -78,6 +82,22 @@ public class NormalTile implements Tile{
 	public Position getPos() {
 		// TODO Auto-generated method stub
 		return this.normalTilePosition;
+	}
+
+	/**
+	 * Draws 2D tile on board.
+	 *
+	 * @param Graphics2D.
+	 */
+
+	@Override
+	public void redraw(Graphics2D g) {
+		// TODO Auto-generated method stub\
+		
+		g.setPaint(Color.WHITE);
+		g.fillRect((normalTilePosition.getX()*TILE_WIDTH)+LEFT_PADDING, (normalTilePosition.getY()*TILE_HEIGHT)-TOP_PADDING, TILE_WIDTH, TILE_HEIGHT);
+		g.setPaint(Color.BLACK);
+		g.drawRect((normalTilePosition.getX()*TILE_WIDTH)+LEFT_PADDING, (normalTilePosition.getY()*TILE_HEIGHT)-TOP_PADDING, TILE_WIDTH, TILE_HEIGHT);
 	}
 	
 	
