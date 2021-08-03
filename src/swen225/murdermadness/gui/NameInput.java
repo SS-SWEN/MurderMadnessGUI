@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,6 +17,7 @@ public class NameInput extends JFrame {
 		private JPanel panel = new JPanel();
 		private JLabel label = new JLabel();
 		private JTextField input = new JTextField("Enter name...",30);
+		private JButton selectButton = new JButton("Select");
 		private String playerName = "";
 		
 		public NameInput() {
@@ -45,9 +47,24 @@ public class NameInput extends JFrame {
 					}
 					playerName = name;
 					label.setText("Select "+name+"'s character");
+					selectButton.setVisible(false);
 				}
 			});
 			
+			selectButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					String name = input.getText();
+					if(name.equals(playerName)) { 
+						label.setText("Name is already taken!"); return;
+					}
+					playerName = name;
+					label.setText("Select "+name+"'s character");
+					selectButton.setVisible(false);
+				}
+			});
+			
+			panel.add(selectButton);
 			panel.add(label);
 			add(panel);
 		}
@@ -55,6 +72,7 @@ public class NameInput extends JFrame {
 		public void resetDisplay() {
 			input.setText("Enter name...");
 			label.setText("");
+			selectButton.setVisible(true);
 		}
 		
 		
