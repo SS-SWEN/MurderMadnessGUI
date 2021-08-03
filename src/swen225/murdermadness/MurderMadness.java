@@ -62,11 +62,11 @@ public class MurderMadness {
     /**
      * Setup the initial game (Players, Board and Cards)
      */
-    public void setup(List<String> playerList) {
+    public void setup(Map<String, String> playerList) {
     	if (playerList.isEmpty()) return;
     	view.initMainGUI();
     	players = new ArrayList<Player>();
-    	for (String s: playerList) {
+    	for (String s: playerList.keySet()) {
     		Player p = new Player(s);
     		players.add(p);
     		try {

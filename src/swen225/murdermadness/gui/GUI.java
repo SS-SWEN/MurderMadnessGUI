@@ -48,7 +48,7 @@ public class GUI {
     	ActionPanel actionPanel = new ActionPanel(this);
     	
 		JLabel actionLabel = new JLabel();
-		actionLabel.setText("Lucilla's Turn");
+		actionLabel.setText("Lucillas Turn");
 		actionLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
 		
 		JLabel eliminationLabel = new JLabel();

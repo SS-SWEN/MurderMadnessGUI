@@ -1,11 +1,12 @@
 package swen225.murdermadness.gui;
 
 import java.awt.FlowLayout;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -22,7 +23,7 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 	private MurderMadness model;
 	
 	private int players = 0;
-	private ArrayList<String> newPlayers;
+	private Map<String, String> allPlayers;
 	
 	public GameSetupFrame(MurderMadness model) {
 		this.model = model;
@@ -57,7 +58,8 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 		confirmBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				players = playerCount.getSelectedIndex()+1;
+				String num = (String)playerCount.getSelectedItem();
+				players = Integer.parseInt(num.replaceAll("\\D+", ""));
 				System.out.println("Number of Players: "+players);
 				initCharSelection();
 			}
@@ -69,7 +71,7 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 		this.add(promptMsg);
 		this.add(helpBtn);
 		this.add(playerCount);
-		this.add(confirmBtn);
+		this.add(confirmBtn);	
 		this.setVisible(true);
 	}
 
@@ -78,10 +80,11 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 	private JRadioButton bertChar;
 	private JRadioButton melinaChar;
 	private JRadioButton percyChar;
+	private NameInput nameInput;
 	
 	public void initCharSelection() {
 		count = 0;
-		newPlayers = new ArrayList<String>();
+		allPlayers = new HashMap<String, String>();
 		
 		this.setVisible(false);
 		this.getContentPane().removeAll();
@@ -120,9 +123,13 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 		this.add(bertChar);
 		this.add(melinaChar);
 		this.add(percyChar);
+		
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
+		
+		this.nameInput = new NameInput();
+		
 		return;
 	}
 	
@@ -130,35 +137,44 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 	 * Assign Character to Specific Player
 	 */
 	@Override
-	public void actionPerformed(ActionEvent e) {		
-		if (e.getSource()==lucillaChar) {
+	public void actionPerformed(ActionEvent e) {	
+		if(allPlayers.containsKey(nameInput.getName()) || nameInput.getName().equals("")) {
+			nameInput.displayRequire();
+			nameInput.toFront();
+			return;
+		}	
+		
+		if(e.getSource()==lucillaChar) {
 			lucillaChar.setEnabled(false);
-			newPlayers.add("Lucilla");
+			allPlayers.put(nameInput.getName(), "Lucilla");
 		}
 		else if (e.getSource()==bertChar) {
 			bertChar.setEnabled(false);
-			newPlayers.add("Bert");
+			allPlayers.put(nameInput.getName(), "Bert");
 		}
 		else if (e.getSource()==melinaChar) {
 			melinaChar.setEnabled(false);
-			newPlayers.add("Melina");
+			allPlayers.put(nameInput.getName(), "Melina");
 		}
 		else if (e.getSource()==percyChar) {
 			percyChar.setEnabled(false);
-			newPlayers.add("Percy");
+			allPlayers.put(nameInput.getName(), "Percy");
 		}
-		
+
 		count++;
 		this.setTitle("Character Selection: Player "+count);
-		if (count > players) {
+		if (count == players) {
 			this.setVisible(false);
-			model.setup(newPlayers);
+			model.setup(allPlayers);
 			this.dispose();
 			return;
 		}
+		
+		nameInput.resetDisplay();
+		nameInput.toFront();
 	}
 	
-	public ArrayList<String> getPlayers() {
-		return this.newPlayers;
+	public Map<String, String> getPlayers(){
+		return this.allPlayers;
 	}
 }
