@@ -12,6 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+/**
+ * JTextField Window that lets a user input their name into the text field to be used in
+ * the game
+ *
+ */
 public class NameInput extends JFrame {
 
 		private JPanel panel = new JPanel();
@@ -27,8 +32,7 @@ public class NameInput extends JFrame {
 			setLocationRelativeTo(null);
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
 			
-			setVisible(true);
-			
+			// clear default text when text field is clicked on
 			input.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -38,6 +42,7 @@ public class NameInput extends JFrame {
 				}
 			});
 			
+			// let user input name by pressing 'enter' on the keyboard
 			input.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -51,6 +56,7 @@ public class NameInput extends JFrame {
 				}
 			});
 			
+			// let user input name by Select on the window
 			selectButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -67,15 +73,21 @@ public class NameInput extends JFrame {
 			panel.add(selectButton);
 			panel.add(label);
 			add(panel);
+			setVisible(true);
 		}
 		
+		/**
+		 * Reset the display default state
+		 */
 		public void resetDisplay() {
 			input.setText("Enter name...");
 			label.setText("");
 			selectButton.setVisible(true);
 		}
 		
-		
+		/**
+		 * Display if player does not enter a name
+		 */
 		public void displayRequire() {
 			label.setText("Please input your name!");
 		}
