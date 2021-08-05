@@ -13,7 +13,8 @@ import swen225.murdermadness.view.Position;
 
 public class Player {
 	
-	final private String name;
+	private final String userName;
+	private final String name;
 	private Position pos;
 	private List<Position> prevPositions;
     private int stepsRemaining = 0;
@@ -77,6 +78,9 @@ public class Player {
 		return this.name;
 	}
 	
+	public String getUsername() {
+		return this.userName;
+	}
 	
 	public void setInGame(boolean status) {
 		this.inGame = status;
@@ -94,8 +98,9 @@ public class Player {
 		this.hand = cards;
 	}
 	
-	public Player(String name) {
+	public Player(String userName, String name) {
 		this.name = name;
+		this.userName = userName;
 		hand = new ArrayList<Card>();
 		eliminations = new HashSet<Card>();
 		prevPositions = new ArrayList<Position>();

@@ -12,10 +12,7 @@ import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 
 import swen225.murdermadness.MurderMadness;
-
-
-
-
+import swen225.murdermadness.Player;
 
 public class GUI {  
 
@@ -23,7 +20,9 @@ public class GUI {
 	private GameSetupFrame setupFrame;
 	
 	private JFrame frame;
-	private ActionPanel controls;
+	private ActionPanel actionControl;
+	
+	private JLabel playerTurnLabel;
 	
 	private JPanel drawing;
 	private JPanel userHUD;
@@ -45,11 +44,11 @@ public class GUI {
     public void initMainGUI() {
 
     	// Action Buttons 
-    	ActionPanel actionPanel = new ActionPanel(this);
+    	actionControl = new ActionPanel(model, this);
     	
-		JLabel actionLabel = new JLabel();
-		actionLabel.setText("Lucillas Turn");
-		actionLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+		playerTurnLabel = new JLabel();
+		playerTurnLabel.setText("A Game of MurderMadness has Started!");
+		playerTurnLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
 		
 		JLabel eliminationLabel = new JLabel();
 		eliminationLabel.setText("Elimination Sheet");
@@ -62,11 +61,11 @@ public class GUI {
     	controls.setBorder(edge);
     	
     	controls.setLayout(new GridLayout(1, 6));
-    	controls.add(actionPanel);
+    	controls.add(actionControl);
     	
     	JPanel labels = new JPanel();
     	labels.setLayout(new BorderLayout());
-    	labels.add(actionLabel, BorderLayout.WEST);
+    	labels.add(playerTurnLabel, BorderLayout.WEST);
     	labels.add(eliminationLabel, BorderLayout.EAST);
     	
     	// Top Horizontal Row Panels
@@ -171,6 +170,34 @@ public class GUI {
     	BufferedImage img = model.grabAsset("assets/dice-placeholder.jpg");
     	g.drawImage(img, 0, 0, 100, 100, null);
     	
+    	
+    	int roll = (int) (((Math.random() * 6) + 1) + ((Math.random() * 6) + 1));
+    	model.setPlayerSteps(roll);
+    	System.out.println("Rolled "+roll);
+    	actionControl.enableMove(true);
+    }
+    
+    /*
+     * Prompt Window for turns
+     */
+    public void onPlayerTurn(Player p) {
+		String[] options = {"Continue"};
+		JPanel panel = new JPanel();
+		JLabel label = new JLabel("It is currently "+p.getUsername()+"'s Turn as "+p.getName());
+		panel.add(label);
+		JOptionPane.showOptionDialog(null, panel, "CURRENT TURN!", JOptionPane.DEFAULT_OPTION,
+		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+		this.playerTurnLabel.setText(p.getUsername()+"'s Turn as "+p.getName());
+		actionControl.enableMove(false);
+    }
+    
+    public void errorPrompt(String msg) {
+		String[] options = {"Continue"};
+		JPanel panel = new JPanel();
+		JLabel label = new JLabel(msg);
+		panel.add(label);
+		JOptionPane.showOptionDialog(null, panel, "INFO", JOptionPane.DEFAULT_OPTION,
+		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
     }
     
     /*
@@ -180,7 +207,4 @@ public class GUI {
     	return (Graphics2D)this.drawing.getGraphics();
     }
     
-    public JPanel getControls() {
-    	return this.controls;
-    }
 }

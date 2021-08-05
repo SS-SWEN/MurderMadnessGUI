@@ -10,20 +10,37 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import swen225.murdermadness.MurderMadness;
+import swen225.murdermadness.MurderMadness.Direction;
 
 public class ActionPanel extends JPanel {
 
+	private MurderMadness model;
 	private GUI view;
 	
-	public ActionPanel(GUI view) {
+	private JButton accuse, suggest, roll, hand;
+	private JButton west, east, north, south;
+	
+	public ActionPanel(MurderMadness model, GUI view) {
+		this.model = model;
 		this.view = view;
 		initialise();
+	}
+	
+	public void enableMove(boolean status) {
+		west.setEnabled(status);
+		east.setEnabled(status);
+		north.setEnabled(status);
+		south.setEnabled(status);
+	}
+	
+	public void enableRoll(boolean status) {
+		roll.setEnabled(status);
 	}
 	
 	public void initialise() {
 		
 		// Accuse Button
-    	JButton accuse = new JButton("Accuse");
+    	accuse = new JButton("Accuse");
 		accuse.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {	
@@ -33,7 +50,7 @@ public class ActionPanel extends JPanel {
 		accuse.setEnabled(false);
 
 		// Guess Button
-		JButton suggest = new JButton("Guess");
+		suggest = new JButton("Guess");
 		suggest.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
@@ -43,37 +60,37 @@ public class ActionPanel extends JPanel {
 		suggest.setEnabled(false);
 		
 		// Direction
-    	JButton west = new JButton("\u2190");
+    	west = new JButton("\u2190");
 		west.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-
+				model.onPlayerMove(Direction.LEFT);
 			}
-		});
-		JButton east = new JButton("\u2192");
+		});west.setEnabled(false);
+		east = new JButton("\u2192");
 		east.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-
+				model.onPlayerMove(Direction.RIGHT);
 			}
-		});
-		JButton north = new JButton("\u2191");
+		});east.setEnabled(false);
+		north = new JButton("\u2191");
 		north.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-
+				model.onPlayerMove(Direction.UP);
 			}
-		});
-		JButton south = new JButton("\u2193");
+		});north.setEnabled(false);
+		south = new JButton("\u2193");
 		south.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-
+				model.onPlayerMove(Direction.DOWN);
 			}
-		});
+		});south.setEnabled(false);
 	
 		// Roll Button
-		JButton roll = new JButton("Roll");
+		roll = new JButton("Roll");
 		roll.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
@@ -82,7 +99,7 @@ public class ActionPanel extends JPanel {
 		});
 
 		// Hand Button
-		JButton hand = new JButton("Hand");
+		hand = new JButton("Hand");
 		hand.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {

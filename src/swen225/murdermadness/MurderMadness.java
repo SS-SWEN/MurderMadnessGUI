@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
@@ -52,6 +53,7 @@ public class MurderMadness {
 	private Set<Card> murderSolution;
 	private Map<String, Card> allCards;
 	private List<Player> players;
+	private int currentPlayer;
 	
     public MurderMadness() {
     	isOngoing = true;
@@ -66,14 +68,17 @@ public class MurderMadness {
     	if (playerList.isEmpty()) return;
     	view.initMainGUI();
     	players = new ArrayList<Player>();
-    	for (String s: playerList.keySet()) {
-    		Player p = new Player(s);
+    	for (Entry<String, String> et: playerList.entrySet()) {
+    		Player p = new Player(et.getKey(), et.getValue());
     		players.add(p);
     		try {
     			BufferedImage img = grabAsset("assets/player-placeholder.png");
     			p.setImg(img);
     		} catch (Exception e) {e.printStackTrace();}
     	}
+    	currentPlayer = 0;
+    	view.onPlayerTurn(players.get(currentPlayer));
+    	initializeCards();
     }
     
     /*
@@ -86,23 +91,66 @@ public class MurderMadness {
     /*
      * Redraws userHUD
      */
-    
     public void updateHUD(Graphics2D g) {
-    	// TODO: Temporary Test
+    	
+    }
+    
+    public boolean endOfCycle() {
+    	if (currentPlayer == players.size()) {
+    		// Cycled through all the players
+    		currentPlayer = 0;
+    		return true;
+    	}
+    	return false;
+    }
 
-    }
     
-    /*
-     * Helper Method to grab assets
+    /**
+	 * Ask the player which direction to move. Player is then
+	 * moved across the board according to input
      */
-    public BufferedImage grabAsset(String path) {
-		try {
-			BufferedImage img = ImageIO.read(new File(path));
-			return img;
-		} catch (Exception e) {e.printStackTrace();}
-		return null;
+    public void onPlayerMove(Direction dir) {
+    	Player p = players.get(currentPlayer);
+    	if (!p.hasRemainingSteps()) {
+    		view.errorPrompt("You have run out of Steps!");
+    		currentPlayer++; // Player cannot move, go next player
+    		endOfCycle(); // Check if Cycle ended
+    		view.onPlayerTurn(players.get(currentPlayer));
+    		return;
+    	}
+
+    	System.out.println("Moving "+dir);
+		switch (dir) {
+        case UP:
+            board.movePlayer(p, Direction.UP, 1);
+            break;
+        case RIGHT:
+            board.movePlayer(p, Direction.RIGHT, 1);
+            break;
+        case DOWN:
+            board.movePlayer(p, Direction.DOWN, 1);
+            break;
+        case LEFT:
+            board.movePlayer(p, Direction.LEFT, 1);
+            break;
+        default:
+            break;
+	}
+    	
     }
     
+    public void setPlayerSteps(int steps) {
+    	players.get(currentPlayer).setStepsRemaining(steps);;
+    }
+    
+    
+    
+    
+    
+    
+    
+    /*--------------------------------------------*/
+    // Redundant Just Use For Reference - delete layer maybe
     /**
      * Run the game
      */
@@ -127,7 +175,7 @@ public class MurderMadness {
 	    		int roll = (int) (((Math.random() * 6) + 1) + ((Math.random() * 6) + 1));
 	    		p.setStepsRemaining(roll);
 	    		if (p.inGame) {
-		    		onPlayerMove(p);
+		    		//onPlayerMove(p);
 			    	if (p.getEstate() != null) {
 			    		while(true) {
 				    		try {
@@ -166,11 +214,11 @@ public class MurderMadness {
     	}
     }
     
-    /**
-	 * Ask the player which direction to move, and how many steps. Player is then
-	 * moved across the board according to input
-     */
-    private void onPlayerMove(Player player) {
+
+    
+    // Redundant - delete later
+    private void onPlayerMove() {
+    	Player player = null;
     	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
     	board.show(view.getGraphics());
     	System.out.println("==============================================================");
@@ -267,6 +315,8 @@ public class MurderMadness {
     	}
     	board.removeTrail(player);
     }
+   
+    
     
     /*
      * Initialize the cards, the murder scenario and the hands that the players
@@ -554,6 +604,14 @@ public class MurderMadness {
    
     public List<Player> getPlayers() {
     	return Collections.unmodifiableList(this.players);
+    }
+    
+    public BufferedImage grabAsset(String path) {
+		try {
+			BufferedImage img = ImageIO.read(new File(path));
+			return img;
+		} catch (Exception e) {e.printStackTrace();}
+		return null;
     }
     
 	public static void main(String[] args) {

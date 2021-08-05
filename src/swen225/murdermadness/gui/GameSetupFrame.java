@@ -167,6 +167,7 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 			this.setVisible(false);
 			model.setup(allPlayers);
 			this.dispose();
+			nameInput.dispose();
 			return;
 		}
 		
