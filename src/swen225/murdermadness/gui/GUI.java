@@ -164,17 +164,70 @@ public class GUI {
      * Rolls the dice
      */
     public void roll() {
+    	BufferedImage img1 = null;
+    	BufferedImage img2 = null;
     	Animate.rollDice();
     	Graphics2D g = (Graphics2D)this.userHUD.getGraphics();
     	// Start Drawing the dice - Temporary of course
-    	BufferedImage img = model.grabAsset("assets/dice-placeholder.jpg");
-    	g.drawImage(img, 0, 0, 100, 100, null);
+    	int roll1 = (int) (((Math.random() * 6) + 1));
+    	int roll2 = (int) (((Math.random() * 6) + 1));
+    	switch(roll1) {
+    	  case 1:
+    		  img1 = model.grabAsset("assets/dice_1.png");
+    	    break;
+    	  case 2:
+    		  img1 = model.grabAsset("assets/dice_2.png");
+    		  break;
+    	  case 3:
+    		  img1 = model.grabAsset("assets/dice_3.png");
+      	    break;
+      	  case 4:
+      		  img1 = model.grabAsset("assets/dice_4.png");
+      		 break;
+    	  case 5:
+    		  img1 = model.grabAsset("assets/dice_5.png");
+      	    break;
+      	  case 6:
+      		  img1 = model.grabAsset("assets/dice_6.png");
+    	    break;
+    	  default:
+    	    // code block
+    	}
+    	switch(roll2) {
+  	  case 1:
+  		  img2 = model.grabAsset("assets/dice_1.png");
+  	    break;
+  	  case 2:
+  		  img2 = model.grabAsset("assets/dice_2.png");
+  		  break;
+  	  case 3:
+  		  img2 = model.grabAsset("assets/dice_3.png");
+    	    break;
+    	  case 4:
+          img2 = model.grabAsset("assets/dice_4.png");
+    		 break;
+  	  case 5:
+  		  img2 = model.grabAsset("assets/dice_5.png");
+    	    break;
+    	  case 6:
+          img2 = model.grabAsset("assets/dice_6.png");
+  	    break;
+  	  default:
+  	    // code block
+    	}
+    
     	
-    	
-    	int roll = (int) (((Math.random() * 6) + 1) + ((Math.random() * 6) + 1));
-    	model.setPlayerSteps(roll);
-    	System.out.println("Rolled "+roll);
+    	g.drawImage(img1, 0, 0, 100, 100, null);
+    	g.drawImage(img2, 100, 0, 100, 100, null);
+    	g.setColor(new Color(255,255,255));
+    	g.fillRect(200, 35, 100, 20);
+    	g.setColor(new Color(0,0,0));
+    	Font font = new Font("Helvetica", Font.BOLD, 15);
+    	g.setFont(font);
+    	g.drawString("Rolled "+((int)roll1+(int)roll2), 220, 50);
+    	model.setPlayerSteps(roll1+roll2);
     	actionControl.enableMove(true);
+        actionControl.enableRoll(false);
     }
     
     /*
@@ -189,6 +242,7 @@ public class GUI {
 		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 		this.playerTurnLabel.setText(p.getUsername()+"'s Turn as "+p.getName());
 		actionControl.enableMove(false);
+		actionControl.enableRoll(true);
     }
     
     public void errorPrompt(String msg) {
