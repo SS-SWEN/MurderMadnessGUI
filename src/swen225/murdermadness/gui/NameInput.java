@@ -1,10 +1,8 @@
 package swen225.murdermadness.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,6 +22,7 @@ public class NameInput extends JFrame {
 		private JTextField input = new JTextField("Enter name...",30);
 		private JButton selectButton = new JButton("Select");
 		private String playerName = "";
+		private List<String> usedNames = new ArrayList<String>();
 		
 		public NameInput() {
 			setTitle("Enter Your Name");
@@ -41,15 +40,32 @@ public class NameInput extends JFrame {
 					}
 				}
 			});
+
+			/**
+			 * clear default text when a key is pressed
+			 */
+			input.addKeyListener(new KeyListener(){
+				@Override
+				public void keyTyped(KeyEvent e) { }
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if(input.getText().equals("Enter name...")) {
+						input.setText("");
+					}
+				}
+				@Override
+				public void keyReleased(KeyEvent e) { }
+			});
 			
 			// let user input name by pressing 'enter' on the keyboard
 			input.addActionListener(new ActionListener(){
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String name = input.getText();
-					if(name.equals(playerName)) { 
+					if(usedNames.contains(name)) {
 						label.setText("Name is already taken!"); return;
 					}
+					usedNames.add(name);
 					playerName = name;
 					label.setText("Select "+name+"'s character");
 					selectButton.setVisible(false);
@@ -61,9 +77,10 @@ public class NameInput extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					String name = input.getText();
-					if(name.equals(playerName)) { 
+					if(usedNames.contains(name)) {
 						label.setText("Name is already taken!"); return;
 					}
+					usedNames.add(name);
 					playerName = name;
 					label.setText("Select "+name+"'s character");
 					selectButton.setVisible(false);

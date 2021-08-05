@@ -65,27 +65,34 @@ public class ActionPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
 				model.onPlayerMove(Direction.LEFT);
+				model.updateBoard(view.getGraphics());
 			}
 		});west.setEnabled(false);
+
 		east = new JButton("\u2192");
 		east.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
 				model.onPlayerMove(Direction.RIGHT);
+				model.updateBoard(view.getGraphics());
 			}
 		});east.setEnabled(false);
+
 		north = new JButton("\u2191");
 		north.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
 				model.onPlayerMove(Direction.UP);
+				model.updateBoard(view.getGraphics());
 			}
 		});north.setEnabled(false);
+
 		south = new JButton("\u2193");
 		south.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
 				model.onPlayerMove(Direction.DOWN);
+				model.updateBoard(view.getGraphics());
 			}
 		});south.setEnabled(false);
 	

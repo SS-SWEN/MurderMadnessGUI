@@ -71,6 +71,20 @@ public class MurderMadness {
     	for (Entry<String, String> et: playerList.entrySet()) {
     		Player p = new Player(et.getKey(), et.getValue());
     		players.add(p);
+			switch(et.getValue()){
+				case("Lucilla"):
+					p.setPos(new Position(11,1));
+					break;
+				case("Percy"):
+					p.setPos(new Position(22,14));
+					break;
+				case("Malina"):
+					p.setPos(new Position(9,22));
+					break;
+				case("Bert"):
+					p.setPos(new Position(1,9));
+					break;
+			}
     		try {
     			BufferedImage img = grabAsset("assets/player-placeholder.png");
     			p.setImg(img);
@@ -113,6 +127,8 @@ public class MurderMadness {
     	Player p = players.get(currentPlayer);
     	if (!p.hasRemainingSteps()) {
     		view.errorPrompt("You have run out of Steps!");
+    		p.resetPrev();
+
     		currentPlayer++; // Player cannot move, go next player
     		endOfCycle(); // Check if Cycle ended
     		view.onPlayerTurn(players.get(currentPlayer));
@@ -136,19 +152,13 @@ public class MurderMadness {
         default:
             break;
 	}
-    	
+
     }
     
     public void setPlayerSteps(int steps) {
     	players.get(currentPlayer).setStepsRemaining(steps);;
     }
-    
-    
-    
-    
-    
-    
-    
+
     /*--------------------------------------------*/
     // Redundant Just Use For Reference - delete layer maybe
     /**
@@ -313,7 +323,7 @@ public class MurderMadness {
     		}
     	}
     	}
-    	board.removeTrail(player);
+    	//board.removeTrail(player);
     }
    
     

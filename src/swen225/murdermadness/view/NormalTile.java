@@ -3,6 +3,7 @@ package swen225.murdermadness.view;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import swen225.murdermadness.Player;
 
@@ -24,17 +25,18 @@ public class NormalTile implements Tile{
 		this.normalTilePosition = p;
 		this.character = c;
 	}
-	
+
 	public String getCharacter() {
 		return character;
 		
 	}
-	
+
 	/**
 	 * Sets the character of the tile.
 	 *
 	 *@param c Character of the tile in the board.
 	 */
+
 	public void setCharacter(String c) {
 		this.character = c;
 	}
@@ -42,11 +44,12 @@ public class NormalTile implements Tile{
 	public String getPlayerName(Player p) {
 		return p.getName();
 	}
-	
+
 	public void setPlayer(Player p) {
 		this.player = p;
 		
 	}
+
 	
 	/**
 	 * Gets the position of the tile.
@@ -80,20 +83,21 @@ public class NormalTile implements Tile{
 
 	@Override
 	public Position getPos() {
-		// TODO Auto-generated method stub
 		return this.normalTilePosition;
 	}
+
+	public boolean containsCharacter(){
+		return player == null;
+	}
+
 
 	/**
 	 * Draws 2D tile on board.
 	 *
-	 * @param Graphics2D.
+	 * @param
 	 */
-
 	@Override
 	public void redraw(Graphics2D g) {
-		// TODO Auto-generated method stub\
-		
 		g.setPaint(Color.WHITE);
 		g.fillRect((normalTilePosition.getX()*TILE_WIDTH)+LEFT_PADDING, (normalTilePosition.getY()*TILE_HEIGHT)-TOP_PADDING, TILE_WIDTH, TILE_HEIGHT);
 		g.setPaint(Color.BLACK);

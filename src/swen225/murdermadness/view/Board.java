@@ -58,12 +58,9 @@ public class Board {
 				this.board[x][y].redraw(g);
 			}
 		}
-		
-		/*
 		for (Player p: model.getPlayers()) {
 			p.redraw(g);
 		}
-		*/
 	}
 	
 	/**
@@ -79,14 +76,16 @@ public class Board {
 		for (int x = 0; x <= 23; x++) {
 			for (int y = 0; y <= 23; y++) {
 				String c = Character.toString(layout.charAt(counter));
-				this.board[x][y] = new NormalTile(new Position(x, y) , c);	
+				this.board[x][y] = new NormalTile(new Position(x, y) , c);
 			}
 		}
 		//playerStartingPositions
+		/**
 		this.board[11][1] = new NormalTile(new Position(11,1),"L"); // lucilla
 		this.board[22][14] = new NormalTile(new Position(22,14),"P"); // Percy
 		this.board[9][22] = new NormalTile(new Position(9,22),"M"); // Malina
 		this.board[1][9] = new NormalTile(new Position(1,9),"B"); // Bert
+		 */
 		
 		// Haunted House walls
 
@@ -214,6 +213,21 @@ public class Board {
 				this.board[19][21] = new Wall(new Position(19,21),"P");
 				this.board[20][21] = new Wall(new Position(20,21),"P");
 				this.board[21][21] = new Wall(new Position(21,21),"P");
+
+				//columns
+				for(int y = 0; y < 2; y++){
+					for(int x = 0; x < 2; x++){
+						Position pT = new Position(11+x,5+y);
+						Position pL = new Position(5+x, 11+y);
+						Position pR = new Position(17+x, 11+y);
+						Position pB = new Position(11+x, 17+y);
+
+				this.board[pT.getX()][pT.getY()] = new Wall(pT, "G");
+				this.board[pL.getX()][pL.getY()] = new Wall(pL, "G");
+				this.board[pR.getX()][pR.getY()] = new Wall(pR, "G");
+				this.board[pB.getX()][pB.getY()] = new Wall(pB, "G");
+			}
+		}
 				
 				
 				hauntedHouse.add(this.board[2][2]);// top left
@@ -290,10 +304,6 @@ public class Board {
     			System.out.println("A character is already in this spot!");
     			return false;
     		}
-    		
-    		//move player to next tile, reset last tile to x, indicating they cannot go back there this turn
-	        this.board[next.getPos().getX()][next.getPos().getY()].setCharacter(board[player.getPos().getX()][player.getPos().getY()].getCharacter());
-	        this.board[player.getPos().getX()][player.getPos().getY()].setCharacter("x");
 	    	player.updateLocation(next.getPos());
 	    	player.decrementStep();
     	}
@@ -314,15 +324,6 @@ public class Board {
     }
     
     /**
-     * Removes player's trail of visited tiles (x) during their turn
-     */
-    public void removeTrail(Player p) {
-    	for(Position pos : p.getPrevPos()) {
-    		this.board[pos.getX()][pos.getY()].setCharacter(".");
-    	}
-    }
-    
-    /**
      * Removes character from board if no Player controls it.
      */
     public void removeCharacter(String name) {
@@ -339,9 +340,4 @@ public class Board {
     		this.board[1][9] = new NormalTile(new Position(1,9), ".");
     	}
     }
-
-    
-    
-    
-
 }

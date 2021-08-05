@@ -1,7 +1,9 @@
 package swen225.murdermadness;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 import java.util.*;
+import java.util.List;
 
 import swen225.murdermadness.cards.*;
 import swen225.murdermadness.view.Position;
@@ -12,7 +14,47 @@ import swen225.murdermadness.view.Position;
  */
 
 public class Player {
-	
+
+	//TODO Redraw methods (Tile AND Player) could be put a separate class?
+	public static final int TILE_WIDTH = 25;
+	public static final int TILE_HEIGHT = 25;
+	public static final int LEFT_PADDING= (getBoardWidth() - (24 * TILE_WIDTH))/2;
+	public static final int TOP_PADDING = (getBoardHeight() - (24 * TILE_HEIGHT))/2;
+	static private int getBoardWidth() {
+		try
+		{
+			Class<?> forName = Class.forName("swen225.murdermadness.gui.GUI");;
+
+			Field f = forName.getDeclaredField("DFLT_DRAWING_WIDTH");
+			Class<?> type = f.getType();
+			f.setAccessible(true);
+			return ((int) f.get(type));
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	static private int getBoardHeight() {
+		try
+		{
+			Class<?> forName = Class.forName("swen225.murdermadness.gui.GUI");
+
+			Field f = forName.getDeclaredField("DFLT_DRAWING_HEIGHT");
+			Class<?> type = f.getType();
+			f.setAccessible(true);
+			return ((int) f.get(type));
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
 	private final String userName;
 	private final String name;
 	private Position pos;
@@ -177,9 +219,20 @@ public class Player {
     public void setImg(BufferedImage img) {
     	this.playerIcon = img;
     }
-    
-	public void redraw(Graphics g) {
-		g.drawImage(playerIcon, 50, 50, null);
-	}
 
+	public void redraw(Graphics2D g) {
+		//g.drawImage(playerIcon, pos.getX(), pos.getY(), null);
+		g.setPaint(Color.BLUE);
+		g.fillRect((pos.getX()*TILE_WIDTH)+LEFT_PADDING, (pos.getY()*TILE_HEIGHT)-TOP_PADDING, TILE_WIDTH, TILE_HEIGHT);
+		g.setPaint(Color.BLACK);
+		g.drawRect((pos.getX()*TILE_WIDTH)+LEFT_PADDING, (pos.getY()*TILE_HEIGHT)-TOP_PADDING, TILE_WIDTH, TILE_HEIGHT);
+
+		for(Position p: prevPositions){
+			g.setPaint(Color.RED);
+			g.drawLine((p.getX()*TILE_WIDTH)+LEFT_PADDING,
+					(p.getY()*TILE_HEIGHT)-TOP_PADDING,
+					((p.getX()*TILE_WIDTH)+LEFT_PADDING)+TILE_WIDTH,
+					((p.getY()*TILE_HEIGHT)-TOP_PADDING)+TILE_HEIGHT);
+		}
+	}
 }
