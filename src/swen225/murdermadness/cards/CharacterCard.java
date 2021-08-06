@@ -1,5 +1,10 @@
 package swen225.murdermadness.cards;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+
 import swen225.murdermadness.Player;
 
 /**
@@ -33,5 +38,18 @@ public class CharacterCard implements Card{
 	@Override
 	public String toString() {
 		return "\""+this.character+"\"";
+	}
+
+	/*
+	 * Gets the image of the card.
+	 */
+	@Override
+	public BufferedImage getCardImage() {
+		// TODO Auto-generated method stub
+		try {
+			BufferedImage img = ImageIO.read(new File("assets/"+character+"-card.png"));
+			return img;
+		} catch (Exception e) {e.printStackTrace();}
+		return null;
 	}
 }

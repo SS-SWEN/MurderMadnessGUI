@@ -110,7 +110,7 @@ public class ActionPanel extends JPanel {
 		hand.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-
+				view.showHand();
 			}
 		});
 

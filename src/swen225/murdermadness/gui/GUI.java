@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -13,6 +14,7 @@ import javax.swing.text.DefaultCaret;
 
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.Player;
+import swen225.murdermadness.cards.Card;
 
 public class GUI {  
 
@@ -168,6 +170,7 @@ public class GUI {
     	BufferedImage img2 = null;
     	Animate.rollDice();
     	Graphics2D g = (Graphics2D)this.userHUD.getGraphics();
+    	g.clearRect(0, 0, userHUD.getWidth(), userHUD.getHeight()); // Clears the panel before drawing
     	// Start Drawing the dice - Temporary of course
     	int roll1 = (int) (((Math.random() * 6) + 1));
     	int roll2 = (int) (((Math.random() * 6) + 1));
@@ -252,6 +255,23 @@ public class GUI {
 		panel.add(label);
 		JOptionPane.showOptionDialog(null, panel, "INFO", JOptionPane.DEFAULT_OPTION,
 		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+    }
+    
+    /*
+     * Shows the hand of the current play.
+     */
+    public void showHand() {
+    	Graphics2D g = (Graphics2D)this.userHUD.getGraphics();
+    	g.clearRect(0, 0, userHUD.getWidth(), userHUD.getHeight()); // Clears the panel before drawing
+    	Player p = model.getCurrentPlayer();
+    	List<Card> hand = p.getHand();
+    	int padding = 50;
+    	
+    	// Start drawing
+    	for (Card c : hand) {
+    		g.drawImage(c.getCardImage(), padding, 0, 100, 100, null);
+    		padding += 110;
+    	}
     }
     
     /*

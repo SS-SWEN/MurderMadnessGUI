@@ -1,4 +1,9 @@
 package swen225.murdermadness.cards;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+
 import swen225.murdermadness.*;
 
 /*
@@ -25,6 +30,19 @@ public class EstateCard implements Card  {
 	@Override
 	public String toString() {
 		return "\""+this.estate.getName()+"\"";
+	}
+	
+	/*
+	 * Gets the image of the card.
+	 */
+	@Override
+	public BufferedImage getCardImage() {
+		// TODO Auto-generated method stub
+		try {
+			BufferedImage img = ImageIO.read(new File("assets/"+this.estate.getName()+"-card.png"));
+			return img;
+		} catch (Exception e) {e.printStackTrace();}
+		return null;
 	}
 
 }

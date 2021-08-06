@@ -109,6 +109,7 @@ public class MurderMadness {
     	
     }
     
+    
     public boolean endOfCycle() {
     	if (currentPlayer == players.size()) {
     		// Cycled through all the players
@@ -622,6 +623,13 @@ public class MurderMadness {
 			return img;
 		} catch (Exception e) {e.printStackTrace();}
 		return null;
+    }
+    
+    /*
+     * Gets the current Player.
+     */
+    public Player getCurrentPlayer() {
+    	return players.get(currentPlayer);
     }
     
 	public static void main(String[] args) {
