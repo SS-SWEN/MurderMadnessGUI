@@ -1,13 +1,12 @@
 package swen225.murdermadness.gui;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.MurderMadness.Direction;
@@ -95,7 +94,7 @@ public class ActionPanel extends JPanel {
 				model.updateBoard(view.getGraphics());
 			}
 		});south.setEnabled(false);
-	
+
 		// Roll Button
 		roll = new JButton("Roll");
 		roll.addActionListener(new ActionListener() {
@@ -114,7 +113,6 @@ public class ActionPanel extends JPanel {
 			}
 		});
 
-		
 		this.setMaximumSize(new Dimension(150, 60));
 		this.setLayout(new GridLayout(2, 4));
 		this.add(suggest);
@@ -125,5 +123,64 @@ public class ActionPanel extends JPanel {
 		this.add(west);
 		this.add(south);
 		this.add(east);
+		initKeyBindings();
 	}
+
+	/**
+	 * Associate keys with actions using ActionMaps/InputMaps
+	 */
+	public void initKeyBindings(){
+		ActionMap am = this.getActionMap();
+		InputMap im = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+		// associate inputs w,s,a,d and keyboard arrows with directions
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),"VK_LEFT");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),"VK_RIGHT");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),"VK_UP");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),"VK_DOWN");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0),"VK_A");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0),"VK_D");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0),"VK_W");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0),"VK_S");
+
+		// bind the directions with actions
+		am.put("VK_LEFT", new bindKey("LEFT"));
+		am.put("VK_RIGHT", new bindKey("RIGHT"));
+		am.put("VK_UP", new bindKey("UP"));
+		am.put("VK_DOWN", new bindKey("DOWN"));
+		am.put("VK_A", new bindKey("LEFT"));
+		am.put("VK_D", new bindKey("RIGHT"));
+		am.put("VK_W", new bindKey("UP"));
+		am.put("VK_S", new bindKey("DOWN"));
+	}
+
+	/**
+	 * Binds a particular command key with an action, then the key may be pressed to perform the action
+	 */
+	private class bindKey extends AbstractAction{
+		public bindKey(String action){
+			putValue(ACTION_COMMAND_KEY, action);
+		}
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			if(!roll.isEnabled()) {
+				switch (ev.getActionCommand()) {
+					case ("LEFT"):
+						if (west.isEnabled()) { model.onPlayerMove(Direction.LEFT); }
+						break;
+					case ("RIGHT"):
+						if (east.isEnabled()) { model.onPlayerMove(Direction.RIGHT); }
+						break;
+					case ("UP"):
+						if (north.isEnabled()) { model.onPlayerMove(Direction.UP); }
+						break;
+					case ("DOWN"):
+						if (south.isEnabled()) { model.onPlayerMove(Direction.DOWN); }
+						break;
+				}
+				model.updateBoard(view.getGraphics());
+			}
+		}
+	}
+
 }

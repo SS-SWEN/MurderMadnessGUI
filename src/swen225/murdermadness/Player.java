@@ -221,12 +221,11 @@ public class Player {
     }
 
 	public void redraw(Graphics2D g) {
-		//g.drawImage(playerIcon, pos.getX(), pos.getY(), null);
-		g.setPaint(Color.BLUE);
-		g.fillRect((pos.getX()*TILE_WIDTH)+LEFT_PADDING, (pos.getY()*TILE_HEIGHT)-TOP_PADDING, TILE_WIDTH, TILE_HEIGHT);
-		g.setPaint(Color.BLACK);
-		g.drawRect((pos.getX()*TILE_WIDTH)+LEFT_PADDING, (pos.getY()*TILE_HEIGHT)-TOP_PADDING, TILE_WIDTH, TILE_HEIGHT);
-
+		g.drawImage(playerIcon, (pos.getX()*TILE_WIDTH)+LEFT_PADDING,
+				(pos.getY()*TILE_HEIGHT)-TOP_PADDING,
+				TILE_WIDTH,
+				TILE_HEIGHT,
+				null);
 		for(Position p: prevPositions){
 			g.setPaint(Color.RED);
 			g.drawLine((p.getX()*TILE_WIDTH)+LEFT_PADDING,

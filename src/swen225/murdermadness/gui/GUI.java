@@ -1,22 +1,18 @@
 package swen225.murdermadness.gui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.text.DefaultCaret;
 
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.Player;
 import swen225.murdermadness.cards.Card;
 
-public class GUI {  
+public class GUI{
 
 	private MurderMadness model;
 	private GameSetupFrame setupFrame;
@@ -44,7 +40,6 @@ public class GUI {
 	
 	
     public void initMainGUI() {
-
     	// Action Buttons 
     	actionControl = new ActionPanel(model, this);
     	
@@ -94,7 +89,7 @@ public class GUI {
     			model.updateHUD(g2d);
     		}
     	};
-    	
+
     	JSplitPane innerPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     	innerPanel.setEnabled(false);
     	innerPanel.setTopComponent(drawing);
@@ -155,7 +150,7 @@ public class GUI {
    		menuTab.add(newGameItem);
    		menuTab.add(quitItem);
    		menuBar.add(menuTab);
-   		
+
     	frame.setJMenuBar(menuBar);
     	frame.setSize(DFLT_GUI_WIDTH, DFLT_GUI_HEIGHT);
     	frame.setLocationRelativeTo(null);
@@ -280,5 +275,4 @@ public class GUI {
     public Graphics2D getGraphics() {
     	return (Graphics2D)this.drawing.getGraphics();
     }
-    
 }

@@ -1,6 +1,7 @@
 package swen225.murdermadness;
 
 import java.awt.Graphics2D;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -153,7 +154,6 @@ public class MurderMadness {
         default:
             break;
 	}
-
     }
     
     public void setPlayerSteps(int steps) {
@@ -212,8 +212,7 @@ public class MurderMadness {
 			    		}
 			    	}
 	    		}
-	    		
-	    		
+
 	    		if (isOngoing) continue;
 	    		else {
 	    			System.out.println("==============================================================");
@@ -226,7 +225,7 @@ public class MurderMadness {
     }
     
 
-    
+
     // Redundant - delete later
     private void onPlayerMove() {
     	Player player = null;
