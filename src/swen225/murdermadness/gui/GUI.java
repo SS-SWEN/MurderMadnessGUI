@@ -1,24 +1,30 @@
 package swen225.murdermadness.gui;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.text.DefaultCaret;
 
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.Player;
 import swen225.murdermadness.cards.Card;
 
-public class GUI{
+public class GUI {  
 
 	private MurderMadness model;
 	private GameSetupFrame setupFrame;
+	private RefuteAccuseFrame refuteAccuse;
 	
 	private JFrame frame;
 	private ActionPanel actionControl;
+	
 	
 	private JLabel playerTurnLabel;
 	
@@ -36,10 +42,12 @@ public class GUI{
 	public GUI(MurderMadness model) {
 		this.model = model;
 		setupFrame = new GameSetupFrame(model);
+		refuteAccuse = new RefuteAccuseFrame(model);
 	}
 	
 	
     public void initMainGUI() {
+
     	// Action Buttons 
     	actionControl = new ActionPanel(model, this);
     	
@@ -86,10 +94,9 @@ public class GUI{
     		@Override
     		public void paintComponent(Graphics g) {
     			Graphics2D g2d = (Graphics2D) g;
-    			model.updateHUD(g2d);
     		}
     	};
-
+    	
     	JSplitPane innerPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     	innerPanel.setEnabled(false);
     	innerPanel.setTopComponent(drawing);
@@ -150,7 +157,7 @@ public class GUI{
    		menuTab.add(newGameItem);
    		menuTab.add(quitItem);
    		menuBar.add(menuTab);
-
+   		
     	frame.setJMenuBar(menuBar);
     	frame.setSize(DFLT_GUI_WIDTH, DFLT_GUI_HEIGHT);
     	frame.setLocationRelativeTo(null);
@@ -238,20 +245,59 @@ public class GUI{
 		panel.add(label);
 		JOptionPane.showOptionDialog(null, panel, "CURRENT TURN!", JOptionPane.DEFAULT_OPTION,
 		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-		this.playerTurnLabel.setText(p.getUsername()+"'s Turn as "+p.getName());
+		this.setStatus(p.getUsername()+"'s Turn as "+p.getName());
 		actionControl.enableMove(false);
 		actionControl.enableRoll(true);
     }
+    public void setStatus(String msg) {this.playerTurnLabel.setText(msg);}
     
-    public void errorPrompt(String msg) {
-		String[] options = {"Continue"};
+    /*
+     * Shows Player useful information
+     */
+    public void onPrompt(String title, String msg) {
+    	String[] options = {"Continue"};
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel(msg);
 		panel.add(label);
-		JOptionPane.showOptionDialog(null, panel, "INFO", JOptionPane.DEFAULT_OPTION,
+		JOptionPane.showOptionDialog(null, panel, title, JOptionPane.DEFAULT_OPTION,
 		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
     }
     
+    /*
+     * Prompt to show when player enters an estate
+     */
+    public void onEstatePrompt(String title, String msg) {
+    	String[] options = {"Refute", "Accuse", "Keep moving"};
+    	JPanel panel = new JPanel();
+    	JLabel label = new JLabel(msg);
+    	panel.add(label);
+    	int selection = JOptionPane.showOptionDialog(null, panel, title, JOptionPane.DEFAULT_OPTION, 
+    	JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+    	if (selection == 0) {
+    		setStatus("You are currently Refuting");
+    		setMode("REFUTING");
+    		model.gatherPossibleCards();
+    		model.triggerChoose();
+    	} else if (selection == 1) {
+    		setStatus("You are currently Accusing");
+    		setMode("Accusing");
+    		
+    	} else return;
+    }
+    
+    public void checkLogic() {
+    	if (refuteAccuse.getTitle().equals("REFUTING")) {
+    		model.onRefute();
+    	} else if (refuteAccuse.getTitle().equals("ACCUSING")) {
+    		model.onAccusation(null);
+    	}
+    }
+    
+    public void showCards(List<Card> cards) {
+    	refuteAccuse.showCards(cards);
+    }
+    
+    public void setMode(String mode) {this.refuteAccuse.setTitle(mode);}
     /*
      * Shows the hand of the current play.
      */
@@ -275,4 +321,5 @@ public class GUI{
     public Graphics2D getGraphics() {
     	return (Graphics2D)this.drawing.getGraphics();
     }
+    
 }

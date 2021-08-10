@@ -1,7 +1,6 @@
 package swen225.murdermadness;
 
 import java.awt.Graphics2D;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -72,6 +71,7 @@ public class MurderMadness {
     	for (Entry<String, String> et: playerList.entrySet()) {
     		Player p = new Player(et.getKey(), et.getValue());
     		players.add(p);
+    		p.setImg(this.grabAsset("assets/player-placeholder.png"));
 			switch(et.getValue()){
 				case("Lucilla"):
 					p.setPos(new Position(11,1));
@@ -86,14 +86,10 @@ public class MurderMadness {
 					p.setPos(new Position(1,9));
 					break;
 			}
-    		try {
-    			BufferedImage img = grabAsset("assets/player-placeholder.png");
-    			p.setImg(img);
-    		} catch (Exception e) {e.printStackTrace();}
     	}
     	currentPlayer = 0;
-    	view.onPlayerTurn(players.get(currentPlayer));
     	initializeCards();
+    	view.onPlayerTurn(players.get(currentPlayer));
     }
     
     /*
@@ -102,14 +98,6 @@ public class MurderMadness {
     public void updateBoard(Graphics2D g) {
     	board.show(g);
     }
-    
-    /*
-     * Redraws userHUD
-     */
-    public void updateHUD(Graphics2D g) {
-    	
-    }
-    
     
     public boolean endOfCycle() {
     	if (currentPlayer == players.size()) {
@@ -128,7 +116,8 @@ public class MurderMadness {
     public void onPlayerMove(Direction dir) {
     	Player p = players.get(currentPlayer);
     	if (!p.hasRemainingSteps()) {
-    		view.errorPrompt("You have run out of Steps!");
+    		if (dir != null) view.onPrompt("INFO", "You have run out of Steps!");
+    		else view.onPrompt("INFO", "Your turn has ended!");
     		p.resetPrev();
 
     		currentPlayer++; // Player cannot move, go next player
@@ -136,96 +125,39 @@ public class MurderMadness {
     		view.onPlayerTurn(players.get(currentPlayer));
     		return;
     	}
-
-    	System.out.println("Moving "+dir);
 		switch (dir) {
-        case UP:
-            board.movePlayer(p, Direction.UP, 1);
-            break;
-        case RIGHT:
-            board.movePlayer(p, Direction.RIGHT, 1);
-            break;
-        case DOWN:
-            board.movePlayer(p, Direction.DOWN, 1);
-            break;
-        case LEFT:
-            board.movePlayer(p, Direction.LEFT, 1);
-            break;
-        default:
-            break;
-	}
+	        case UP:
+	            board.movePlayer(p, Direction.UP, 1);
+	            break;
+	        case RIGHT:
+	            board.movePlayer(p, Direction.RIGHT, 1);
+	            break;
+	        case DOWN:
+	            board.movePlayer(p, Direction.DOWN, 1);
+	            break;
+	        case LEFT:
+	            board.movePlayer(p, Direction.LEFT, 1);
+	            break;
+	        default:
+	            break;
+		}
+		
+		for (Card card : allCards.values()) {
+			if(card instanceof EstateCard) {
+				EstateCard es = (EstateCard)card;
+				if(es.getEstate().within(p.getPos())) {
+					p.setEstate(es.getEstate());
+					view.onEstatePrompt("ESTATE PROMPT", "You have entered the "+es);
+				}
+			}
+    	}
     }
     
     public void setPlayerSteps(int steps) {
     	players.get(currentPlayer).setStepsRemaining(steps);;
     }
 
-    /*--------------------------------------------*/
-    // Redundant Just Use For Reference - delete layer maybe
-    /**
-     * Run the game
-     */
-    private void runGame(int numPlayers) {
-    	System.out.println("==============================================================");
-    	System.out.println("A Game of MurderMadness has just started: "+numPlayers+" players");
-    	System.out.println("==============================================================");
-  
-    	List<String> availableCharacters = new ArrayList<>();
-    	for (Player p : players) {
-    		availableCharacters.add(p.getName());
-    	}
-        for (String c : characterNames) {
-        	if (!availableCharacters.contains(c)) {
-        		board.removeCharacter(c);
-        	}
-        }
-
-    	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    	while(isOngoing) {
-    		for (Player p: players) {
-	    		int roll = (int) (((Math.random() * 6) + 1) + ((Math.random() * 6) + 1));
-	    		p.setStepsRemaining(roll);
-	    		if (p.inGame) {
-		    		//onPlayerMove(p);
-			    	if (p.getEstate() != null) {
-			    		while(true) {
-				    		try {
-				    			System.out.println("-------------------------------------------------------------");
-					    		System.out.println("You may now make a guess or attempt to solve the murder scenario");
-					    		System.out.println("-------------------------------------------------------------");
-					    		
-					    		//Check if the player wants to make an accusation or guess
-					    		System.out.print("Would you like to guess or accuse? (G/A): ");
-								String confirm = input.readLine();
-								
-								if (confirm.equalsIgnoreCase("g")) {
-									onRefute(p);
-									break;
-								} else if (confirm.equalsIgnoreCase("a")) {
-									onAccusation(p);
-									break;
-								} else {
-									throw new NoSuchElementException("Not a valid input");
-								}
-								
-							} catch (IOException e) {e.printStackTrace();continue;}
-			    		}
-			    	}
-	    		}
-
-	    		if (isOngoing) continue;
-	    		else {
-	    			System.out.println("==============================================================");
-	    			System.out.println(p+" has won the game!! | SCENARIO: "+murderSolution);
-	    			System.out.println("==============================================================");
-	    			break;
-	    		}
-    		}
-    	}
-    }
     
-
-
     // Redundant - delete later
     private void onPlayerMove() {
     	Player player = null;
@@ -487,128 +419,110 @@ public class MurderMadness {
     	}
     }
     
+    
+    private WeaponCard chosenWeapon = null;
+    private CharacterCard chosenCharacter = null;
+    private Pair<List<Card>, List<Card>> possibleCards;
+    
+    public void gatherPossibleCards() {
+        chosenWeapon = null;
+        chosenCharacter = null;
+    	Player p = players.get(currentPlayer);
+		List<Card> weapons = new ArrayList<Card>();
+		List<Card> characters = new ArrayList<Card>();
+		for (Card c: allCards.values()) {
+			if (!p.getEliminations().contains(c) && !p.getHand().contains(c)) {
+				if (c instanceof WeaponCard)
+					weapons.add(c);
+				if (c instanceof CharacterCard)
+					characters.add(c);
+			}
+		}
+		possibleCards = new Pair<List<Card>, List<Card>>(weapons, characters);
+    }
+    
     /*
      * A player attempts to guess a card that may or may not exist in the murder scenario.
      */
-    public void onRefute(Player p) {
-    	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    	while (true) {
-    		try {
-    			Estate currentEstate = p.getEstate();
-    			EstateCard estateCard = (EstateCard)allCards.get(currentEstate.getName());
-    			
-    			System.out.println("==============================================================");
-    			System.out.println("YOU ARE CURRENTLY REFUTING");
-	    		System.out.println("You are inside "+currentEstate.getName());
-	    		System.out.println("Hand: "+p.getHand()+" Eliminations: "+p.getEliminations());
-	    		System.out.println("Possible Cards are cards that do not exist in your hand & eliminations");
-	    		System.out.println("==============================================================");
-	    		
-	    		List<Card> weapons = new ArrayList<Card>();
-	    		List<Card> characters = new ArrayList<Card>();
-	    		for (Card c: allCards.values()) {
-	    			if (!p.getEliminations().contains(c) && !p.getHand().contains(c)) {
-	    				if (c instanceof WeaponCard)
-	    					weapons.add(c);
-	    				if (c instanceof CharacterCard)
-	    					characters.add(c);
-	    			}
-	    		}
-	    		
-	    		Display.displayPossibleCards(weapons);
-	    		System.out.print("Guess a WeaponCard: ");
-	    		WeaponCard weaponCard = (WeaponCard)allCards.get(Display.capitalize(input.readLine())); 
-	    		
-	    		if (weaponCard == null) throw new NoSuchElementException("Card does not exist");
-	    		System.out.println("-------------------------------------------------------------");
-	    		
-	    		Display.displayPossibleCards(characters);
-	    		System.out.print("Guess a CharacterCard: ");
-	    		CharacterCard characterCard = (CharacterCard)allCards.get(Display.capitalize(input.readLine()));
-	    		
-	    		if (characterCard == null) throw new NoSuchElementException("Card does not exist");
-	    		System.out.println("-------------------------------------------------------------");
-	    		System.out.println("YOUR GUESSES: "+weaponCard+" & "+characterCard+" inside the "+currentEstate.getName()); 
-	    		System.out.println("-------------------------------------------------------------");
-	    	
-	    		// Move Cards into Current Estate
-    			// remove weapon from one estate, and move it to this estate
-	    		if(!currentEstate.hasThisWeapon(weaponCard)) {
-		    		for(Card c: allCards.values()) {
-		    			if(c instanceof EstateCard) {
-		    				((EstateCard) c).getEstate().removeWeapon(weaponCard);
-		    			}
-		    		}
-		    		currentEstate.addWeapon(weaponCard);
-	    		}
+    public void onRefute() {
+    	Player p = players.get(currentPlayer);
+    	Estate currentEstate = p.getEstate();
+    	EstateCard estateCard = (EstateCard)allCards.get(currentEstate.getName());
 
-	    		// Move guessed player to this estate
-	    		if(!currentEstate.within(characterCard.getPlayer().getPos())) {
-	    			board.moveTo(characterCard, currentEstate);
-	    		}
-	    		
-	    		//redraw the board with moved weapon/character
-	    		board.show(view.getGraphics());
-
-	    		// Check if a player can refute the guess
-	    		Card refutedCard = null;
-	    		List<String> order = characterNames.stream()
-	    				.filter(character -> !character.equalsIgnoreCase(p.getName()))
-	    				.collect(Collectors.toList()); // Filter current player & Ensures an order for guessing
-	    		
-	    		List<Card> options = new ArrayList<Card>();
-	    		for (String pName: order) {
-	    			CharacterCard pChar = (CharacterCard)allCards.get(pName);
-	    			if (pChar == null) continue;
-	    			Player otherPlayer = pChar.getPlayer();
-	    			options = otherPlayer.countRefutableCards(weaponCard, characterCard, estateCard);
-	    			
-		    		if (options.size() > 1) {
-		    			System.out.println(otherPlayer+" can refute one of your guesses");
-			    		System.out.println("Please pass the tablet to "+otherPlayer+" before proceeding");
-			    		System.out.print("Enter any key to proceed..");
-			    		input.readLine();
-				    	while(true) {
-				    		try {
-					    		System.out.println("-------------------------------------------------------------");
-					    		System.out.println(otherPlayer+"'s turn");
-					    		System.out.println("-------------------------------------------------------------");
-					    		System.out.println(p+"'s GUESSES: "+weaponCard+" & "+characterCard+" inside the "+currentEstate.getName());
-					    		System.out.println("-------------------------------------------------------------");
-					    		System.out.println("Your Hand | "+options);
-					    		System.out.println("Enter a number from 1-"+options.size()+" to pick the card");
-					    		System.out.print("Choose ONE card to refute a guess: ");
-					    		int chosenCard = Integer.parseInt(input.readLine());
-					    		if (chosenCard > 0 && chosenCard <= options.size()) {
-					    			refutedCard = options.get(chosenCard-1);
-					    			break;
-					    		}
-					    		System.out.println("Invalid Number");
-					    		continue;
-				    		} catch(Exception e) {e.printStackTrace();continue;}
-				    	}
-				    	break;
-		    		} else if (!options.isEmpty()) {
-		    			System.out.println(otherPlayer+" has refuted one of your guesses");
-		    			refutedCard = options.get(0);
-		    			break;
-		    		}
-	    		}
-	    		
-	    		if (refutedCard != null) {
-					System.out.println(refutedCard+" is no longer possible for this murder scenario");
-					p.addToEliminations(refutedCard);
-	    		} else {
-	    			System.out.println("No one could refute your guesses");
-	    			System.out.println("Potential MurderScenario could be: "+weaponCard+" & "+characterCard+" inside "+currentEstate.getName());
-	    		}
-	    		System.out.println("-------------------------------------------------------------");
-	    		break;
-    		} catch(Exception e) {
-    			System.out.println("-------------------------------------------------------------");
-    			System.out.println("Invalid Input: "+e.getMessage());
-    			continue;
+		if (chosenWeapon == null && chosenCharacter == null) return;
+		view.onPrompt("Chosen Cards to Refute", chosenWeapon+" & "+chosenCharacter+" in the "+estateCard);
+		
+		// Move Cards into Current Estate
+		// remove weapon from one estate, and move it to this estate
+		if(!currentEstate.hasThisWeapon(chosenWeapon)) {
+    		for(Card c: allCards.values()) {
+    			if(c instanceof EstateCard) {
+    				((EstateCard) c).getEstate().removeWeapon(chosenWeapon);
+    			}
     		}
+    		currentEstate.addWeapon(chosenWeapon);
+		}
+
+		// Move guessed player to this estate
+		if(!currentEstate.within(chosenCharacter.getPlayer().getPos())) {
+			board.moveTo(chosenCharacter, currentEstate);
+			updateBoard(view.getGraphics());
+		}
+		
+		Card refutedCard = null;
+		List<String> order = characterNames.stream()
+				.filter(character -> !character.equalsIgnoreCase(p.getName()))
+				.collect(Collectors.toList()); // Filter current player & Ensures the fixed order for guessing
+		
+		// Check if a player can refute the guess
+		List<Card> options = new ArrayList<Card>();
+		for (String pName: order) {
+			CharacterCard pChar = (CharacterCard)allCards.get(pName);
+			if (pChar == null) continue;
+			Player otherPlayer = pChar.getPlayer();
+			options = otherPlayer.countRefutableCards(chosenWeapon, chosenCharacter, estateCard);
+			
+    		if (!options.isEmpty()) {
+    			// Grab the first card that is refutable
+    			refutedCard = options.get(0);
+    			view.onPrompt("Refuting", otherPlayer+" has refuted one of your guesses: \n"+refutedCard+" is no longer part of the MurderSolution");
+    			// TODO: Update Elimination Sheet
+    			
+		    	break;
+    		}
+		}
+		if (refutedCard == null) view.onPrompt("GUESS: "+chosenWeapon+" & "+chosenCharacter+" in "+estateCard, "No one could refute your guesses");
+		p.setStepsRemaining(0);
+		this.onPlayerMove(null); // Force End Of Turn
+    }
+    
+    /*
+     * Trigger Event to choose a Weapon &/OR Character Card
+     * 
+     * - Used for refute and accusations
+     */
+    public void triggerChoose() {
+    	if (chosenWeapon == null) {
+    		view.onPrompt("INFO", "Choose a Weapon to Refute");
+    		view.showCards(possibleCards.getLeft());
+    	} else if (chosenCharacter == null) {
+    		view.onPrompt("INFO", "Choose a Character to Refute");
+    		view.showCards(possibleCards.getRight());   		
+    	} else {
+    		view.checkLogic();;
+    	}
+    }
+    
+    /*
+     * Set the selected Card
+     * 
+     * - Used for refute and accusations
+     */
+    public void setChosenCard(Card card) {
+    	if (card instanceof WeaponCard) {
+    		this.chosenWeapon = (WeaponCard)card;
+    	} else {
+    		this.chosenCharacter = (CharacterCard)card;
     	}
     }
    
@@ -629,6 +543,18 @@ public class MurderMadness {
      */
     public Player getCurrentPlayer() {
     	return players.get(currentPlayer);
+    }
+    
+    // Small Implementation of a Pair Class
+    class Pair<K,V> {
+    	private K a; 
+    	private V b;
+    	public Pair(K left, V right) {
+    		this.a = left;
+    		this.b = right;
+    	}
+    	public K getLeft() {return this.a;}
+    	public V getRight() {return this.b;}
     }
     
 	public static void main(String[] args) {

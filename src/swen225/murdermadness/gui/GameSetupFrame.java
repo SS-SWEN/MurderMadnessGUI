@@ -93,22 +93,22 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 		
 		// Create CharacterCard Radio Options
 		// TODO: Images could potentially be a static global, so Player Classes can make reference to the images.
-		ImageIcon lucillaImg = new ImageIcon("assets/card-placeholder.png"); 
+		ImageIcon lucillaImg = new ImageIcon("assets/lucilla-card.png"); 
 		lucillaChar = new JRadioButton();
 		lucillaChar.addActionListener(this);
 		lucillaChar.setIcon(lucillaImg);
 		
-		ImageIcon bertImg = new ImageIcon("assets/card-placeholder.png");
+		ImageIcon bertImg = new ImageIcon("assets/bert-card.png");
 		bertChar = new JRadioButton();
 		bertChar.addActionListener(this);
 		bertChar.setIcon(bertImg);
 		
-		ImageIcon melinaImg = new ImageIcon("assets/card-placeholder.png");
+		ImageIcon melinaImg = new ImageIcon("assets/melina-card.png");
 		melinaChar = new JRadioButton();
 		melinaChar.addActionListener(this);
 		melinaChar.setIcon(melinaImg);
 		
-		ImageIcon percy = new ImageIcon("assets/card-placeholder.png");
+		ImageIcon percy = new ImageIcon("assets/percy-card.png");
 		percyChar = new JRadioButton();
 		percyChar.addActionListener(this);
 		percyChar.setIcon(percy);

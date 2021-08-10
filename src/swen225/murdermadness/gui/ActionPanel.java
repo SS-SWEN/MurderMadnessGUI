@@ -16,7 +16,7 @@ public class ActionPanel extends JPanel {
 	private MurderMadness model;
 	private GUI view;
 	
-	private JButton accuse, suggest, roll, hand;
+	private JButton roll, hand;
 	private JButton west, east, north, south;
 	
 	public ActionPanel(MurderMadness model, GUI view) {
@@ -37,26 +37,6 @@ public class ActionPanel extends JPanel {
 	}
 	
 	public void initialise() {
-		
-		// Accuse Button
-    	accuse = new JButton("Accuse");
-		accuse.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ev) {	
-				
-			}
-		});
-		accuse.setEnabled(false);
-
-		// Guess Button
-		suggest = new JButton("Guess");
-		suggest.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ev) {
-
-			}
-		});
-		suggest.setEnabled(false);
 		
 		// Direction
     	west = new JButton("\u2190");
@@ -115,11 +95,9 @@ public class ActionPanel extends JPanel {
 
 		this.setMaximumSize(new Dimension(150, 60));
 		this.setLayout(new GridLayout(2, 4));
-		this.add(suggest);
 		this.add(roll);
 		this.add(north);
 		this.add(hand);
-		this.add(accuse);
 		this.add(west);
 		this.add(south);
 		this.add(east);
