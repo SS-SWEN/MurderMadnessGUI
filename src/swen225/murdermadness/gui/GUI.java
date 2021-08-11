@@ -131,6 +131,7 @@ public class GUI {
     	JMenu menuTab = new JMenu("Menu");
 
    		JMenuItem newGameItem = new JMenuItem("New Game");
+   		JMenuItem restartItem = new JMenuItem("Restart Game");
    		JMenuItem quitItem = new JMenuItem("Quit");
 
    		newGameItem.addActionListener(new ActionListener() {
@@ -149,6 +150,18 @@ public class GUI {
    			}
    		});
 
+   		restartItem.addActionListener(ev -> {
+			String[] options = { "Restart", "Cancel" };
+			JPanel panel = new JPanel();
+			JLabel label = new JLabel("Are you sure you want to restart game?");
+			panel.add(label);
+			int selection = JOptionPane.showOptionDialog(null, panel, "WARNING!", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+			if (selection == 0) {
+				model.reset();
+			}
+		});
+
    		quitItem.addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent ev) {
    				String[] options = { "Exit", "Cancel" };
@@ -164,6 +177,7 @@ public class GUI {
    		});
 
    		menuTab.add(newGameItem);
+   		menuTab.add(restartItem);
    		menuTab.add(quitItem);
    		menuBar.add(menuTab);
 

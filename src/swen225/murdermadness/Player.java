@@ -228,6 +228,8 @@ public class Player {
     	this.playerIcon = img;
     }
 
+    public BufferedImage getIcon(){ return this.playerIcon; }
+
 	public void redraw(Graphics2D g) {
 		g.drawImage(playerIcon, (pos.getX()*TILE_WIDTH)+LEFT_PADDING,
 				(pos.getY()*TILE_HEIGHT)-TOP_PADDING,

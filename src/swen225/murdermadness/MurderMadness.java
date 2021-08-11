@@ -164,110 +164,21 @@ public class MurderMadness {
     	players.get(currentPlayer).setStepsRemaining(steps);;
     }
 
-    
-    // Redundant - delete later
-    private void onPlayerMove() {
-    	Player player = null;
-    	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    	board.show(view.getGraphics());
-    	System.out.println("==============================================================");
-    	System.out.println(player.getName()+"'s Turn");
-    	System.out.println("Hand: "+player.getHand()+" Eliminations: "+player.getEliminations());
-    	System.out.println("==============================================================");
-    	
-    	//reset players previous steps for this turn
-    	player.resetPrev();
-    	boolean askAccuse = true; 
-    	
-    	outer: {
-    		while (player.hasRemainingSteps()) {
-    	
-    		try {	    		
-	    		System.out.println("Steps remaining: "+player.getStepsRemaining());
-	    		System.out.println("W = UP | A = LEFT | S = DOWN | D = RIGHT");
-	    		String moveSummary = "invalid move!";
-	    		
-	    		System.out.println("-------------------------------------------------------------");
-	    		System.out.print("Direction: ");
-	    		String dir = input.readLine().toLowerCase();
+	public void reset(){
+		ArrayList<Player> newGame = new ArrayList<>();
+		for(Player p: players) {
+			Player newPlayer = new Player(p.getUsername(),p.getName());
+			newPlayer.setImg(p.getIcon());
+			newGame.add(newPlayer);
+		}
+		players = newGame;
+		currentPlayer = 0;
+		view.onPlayerTurn(players.get(currentPlayer));
+		initializeCards();
+		updateBoard(view.getGraphics());
+	}
 
-				System.out.print("Number of Steps: ");
-	    		int steps = Integer.parseInt(input.readLine());
-	    		System.out.println("-------------------------------------------------------------");
-	    		if(steps > player.getStepsRemaining()) { System.out.println("You don't have enough steps!");}
-	    		
-	    		else {
-	    			switch (dir) {
-	                    case "w":
-	                        if (board.movePlayer(player, Direction.UP, steps)) { 
-	                            moveSummary = "Player " + player + " moved UP: "+steps; }
-	                        break;
-	                    case "d":
-	                        if (board.movePlayer(player, Direction.RIGHT, steps)) { 
-	                            moveSummary = "Player " + player + " moved RIGHT: "+steps; }
-	                        break;
-	                    case "s":
-	                        if (board.movePlayer(player, Direction.DOWN, steps)) { 
-	                            moveSummary = "Player " + player + " moved DOWN: "+steps; }
-	                        break;
-	                    case "a":
-	                        if (board.movePlayer(player, Direction.LEFT, steps)) {
-	                            moveSummary = "Player " + player + " moved LEFT: "+steps; }
-	                        break;
-	                    default:
-	                        moveSummary = "Invalid input!";
-	                        break;
-	            	}
-    			}
-
-	    		System.out.println("==============================================================");
-	    		System.out.println(moveSummary);
-	    		System.out.println("-------------------------------------------------------------");
-	    		if(askAccuse) {
-	    			for (Card card : allCards.values()) {
-	    				if(card instanceof EstateCard) {
-	    					EstateCard es = (EstateCard)card;
-	    					if(es.getEstate().within(player.getPos())) {
-	    						player.setEstate(es.getEstate());
-	    						System.out.println("You have entered "+es.getEstate().getName());
-
-	    						// ask if player wishes to make an guess/accusation now
-	    						System.out.println("Hand: "+player.getHand()+" Eliminations: "+player.getEliminations());
-	    						System.out.print("Would you like to make a guess/accuse now? (y/n): ");
-	    						String confirm = input.readLine();
-	    						// break and go to refute/accuse
-	    						if(confirm.equalsIgnoreCase("y")) { break outer; } 
-	    						// else ask player if they want to keep moving
-	    						else {
-	    							player.setEstate(null);
-	    							System.out.print("Would you like to keep moving? (y/n): ");
-	    							confirm = input.readLine();
-	    							if(confirm.equalsIgnoreCase("y")) { 
-	    								askAccuse = false; 
-	    								break;  
-	    							}
-	    							else { 
-	    								break outer;
-	    							}	
-	    						}
-	    					} else {
-	    						player.setEstate(null);
-	    					}
-	    				}    
-	    			}
-	    		}
-    		} catch(Exception e) {
-    			System.out.println("Invalid Input: "+e);
-    			continue;
-    		}
-    	}
-    	}
-    	//board.removeTrail(player);
-    }
-   
-    
-    
-    /*
+	/*
      * Initialize the cards, the murder scenario and the hands that the players
      * will be dealt
      */
