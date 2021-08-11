@@ -99,6 +99,15 @@ public class MurderMadness {
     public void updateBoard(Graphics2D g) {
     	board.show(g);
     }
+    
+    /*
+     * Redraws Elimination Tab
+     */
+    public void updateElimination(Graphics2D g) {
+    	for (Player p: players) {
+    		p.redraw(g);
+    	}
+    }
 
 	/**
 	 * Check if all players have had their turn for this round

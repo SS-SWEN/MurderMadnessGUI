@@ -117,7 +117,14 @@ public class GUI {
     	innerPanel.setTopComponent(drawing);
     	innerPanel.setBottomComponent(userHUD);
 
-    	JPanel rightPanel = new JPanel();
+    	// Right Panel Elimination Sheet Graphics Pane
+    	JPanel rightPanel = new JPanel() {
+    		@Override
+    		public void paintComponent(Graphics g) {
+    			Graphics2D g2d = (Graphics2D) g;
+    			model.updateElimination(g2d);
+    		}
+    	};
     	rightPanel.setBackground(BACKGROUND_COLOR);
 
     	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
