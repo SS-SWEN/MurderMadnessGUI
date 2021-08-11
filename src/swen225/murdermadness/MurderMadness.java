@@ -90,6 +90,7 @@ public class MurderMadness {
     	currentPlayer = 0;
     	initializeCards();
     	view.onPlayerTurn(players.get(currentPlayer));
+    	System.out.println(murderSolution);
     }
     
     /*
@@ -242,7 +243,7 @@ public class MurderMadness {
 		Random ran = new Random();
 		Collections.shuffle(weapons);Collections.shuffle(characters);Collections.shuffle(estates);
 		
-		//Distribute the evenly weapons to the estates
+		//Distribute the weapons evenly to the estates
 		int i = 0;
 		while(i != weapons.size()) {
 			for(EstateCard e : estates) {
@@ -270,73 +271,6 @@ public class MurderMadness {
 		}
     }
 
-    /*
-     * A player attempts to solve the murder scenario.
-     */
-    public void onAccusation(Player p) {
-    	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    	while (true) {
-    		try {
-    			Estate currentEstate = p.getEstate();
-    			EstateCard estateCard = (EstateCard)allCards.get(currentEstate.getName());
-    			
-    			System.out.println("==============================================================");
-    			System.out.println("YOU ARE CURRENTLY ACCUSING");
-    			System.out.println("You are inside "+currentEstate.getName());
-	    		System.out.println("Pick two cards that you think may be in the murder scenario");
-	    		System.out.println("==============================================================");
-	    		
-	    		List<Card> weapons = new ArrayList<Card>();
-	    		List<Card> characters = new ArrayList<Card>();
-	    		for (Card c: allCards.values()) {
-	    			if (!p.getEliminations().contains(c) && !p.getHand().contains(c)) {
-	    				if (c instanceof WeaponCard)
-	    					weapons.add(c);
-	    				if (c instanceof CharacterCard)
-	    					characters.add(c);
-	    			}
-	    		}
-	    		
-	    		Display.displayPossibleCards(weapons);
-	    		System.out.print("Choose a WeaponCard: ");
-	    		Card weaponCard = allCards.get(Display.capitalize(input.readLine())); 
-	    		
-	    		if (weaponCard == null) throw new NoSuchElementException("Card does not exist");
-	    		System.out.println("-------------------------------------------------------------");
-	    		
-	    		Display.displayPossibleCards(characters);
-	    		System.out.print("Choose a CharacterCard: ");
-	    		Card characterCard = allCards.get(Display.capitalize(input.readLine()));
-	    		
-	    		if (characterCard == null) throw new NoSuchElementException("Card does not exist");
-	    		System.out.println("-------------------------------------------------------------");
-	    		System.out.println("YOUR ACCUSATION: "+weaponCard+" & "+characterCard+" inside the "+currentEstate.getName()); 
-	    		
-	    		String msg = "RESULT: You have failed to choose the right murder scenario, you are now out of this game";
-	    		Set<Card> proposedSolution = new HashSet<Card>(Set.of(weaponCard, characterCard, estateCard));
-	    		System.out.println("PROPOSED: "+proposedSolution);
-	    		System.out.println("SOLUTION: "+murderSolution);
-	    		//correct murder solution, player wins
-	    		if (murderSolution.containsAll(proposedSolution)) {
-	    			msg = "RESULT: Congratulations you were correct!";
-	    			isOngoing = false;
-	    		}
-	    		//player has made a wrong accusation and now cannot make another
-	    		else p.setInGame(false);
-	    		
-	    		System.out.println("==============================================================");
-	    		System.out.println(msg);
-	    		System.out.println("==============================================================");
-	    		System.out.print("Enter any key to proceed..");
-	    		input.readLine();
-	    		break;
-    		} catch(Exception e) {
-    			System.out.println("Invalid Input: "+e.getMessage());
-    			continue;
-    		}
-    	}
-    }
-
     private WeaponCard chosenWeapon = null;
     private CharacterCard chosenCharacter = null;
     private Pair<List<Card>, List<Card>> possibleCards;
@@ -356,6 +290,30 @@ public class MurderMadness {
 			}
 		}
 		possibleCards = new Pair<List<Card>, List<Card>>(weapons, characters);
+    }
+    
+    /*
+     * A player attempts to solve the murder scenario.
+     */
+    public void onAccuse() {
+    	Player p = players.get(currentPlayer);
+    	Estate currentEstate = p.getEstate();
+    	EstateCard estateCard = (EstateCard)allCards.get(currentEstate.getName());
+
+		if (chosenWeapon == null && chosenCharacter == null) return;
+		view.onPrompt("Chosen Cards to Refute", chosenWeapon+" & "+chosenCharacter+" in the "+estateCard);
+		
+		Set<Card> chosenCards = new HashSet<Card>();
+		chosenCards.add(chosenWeapon);chosenCards.add(chosenCharacter);chosenCards.add(estateCard);
+		if (murderSolution.containsAll(chosenCards)) {
+			view.onPrompt("YOU WON!", "Congratulations "+p.getUsername()+" you Won the game!!");
+			view.disableGUI();
+			// TODO: New Game?
+		} else {
+			view.onPrompt("YOU LOST!", "Unfortunately you were wrong, the solution was: "+this.murderSolution);
+			p.setInGame(false);
+			this.onPlayerMove(null);
+		}
     }
     
     /*
@@ -403,8 +361,7 @@ public class MurderMadness {
     			// Grab the first card that is refutable
     			refutedCard = options.get(0);
     			view.onPrompt("Refuting", otherPlayer+" has refuted one of your guesses: \n"+refutedCard+" is no longer part of the MurderSolution");
-    			// TODO: Update Elimination Sheet
-    			
+    			p.addToEliminations(refutedCard); // Updates Elimination Sheet
 		    	break;
     		}
 		}
@@ -420,10 +377,10 @@ public class MurderMadness {
      */
     public void triggerChoose() {
     	if (chosenWeapon == null) {
-    		view.onPrompt("INFO", "Choose a Weapon to Refute");
+    		view.onPrompt("INFO", "Choose a Weapon to "+view.getMode());
     		view.showCards(possibleCards.getLeft());
     	} else if (chosenCharacter == null) {
-    		view.onPrompt("INFO", "Choose a Character to Refute");
+    		view.onPrompt("INFO", "Choose a Character to "+view.getMode());
     		view.showCards(possibleCards.getRight());   		
     	} else {
     		view.checkLogic();;

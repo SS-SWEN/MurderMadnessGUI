@@ -28,7 +28,7 @@ public class GUI {
 
 	private MurderMadness model;
 	private GameSetupFrame setupFrame;
-	private RefuteAccuseFrame refuteAccuse;
+	private JFrame refuteAccuse;
 
 	private JFrame frame;
 	private ActionPanel actionControl;
@@ -49,14 +49,20 @@ public class GUI {
 	public GUI(MurderMadness model) {
 		this.model = model;
 		setupFrame = new GameSetupFrame(model);
-		refuteAccuse = new RefuteAccuseFrame(model);
 	}
 
 	/**
 	 * Initialise the main GUI
 	 */
     public void initMainGUI() {
-
+    	
+    	// Initialize Refute & Accuse Window
+    	refuteAccuse = new JFrame();
+    	refuteAccuse.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	refuteAccuse.setResizable(false);
+    	refuteAccuse.setSize(300,160);
+    	refuteAccuse.setLocationRelativeTo(null);
+    	
     	// Action Buttons
     	actionControl = new ActionPanel(model, this);
 
@@ -144,8 +150,8 @@ public class GUI {
    				int selection = JOptionPane.showOptionDialog(null, panel, "WARNING!", JOptionPane.DEFAULT_OPTION,
     					JOptionPane.WARNING_MESSAGE, null, options, options[1]);
    				if (selection == 0) {
-   	   				setupFrame = new GameSetupFrame(model);
-   	   				frame.dispose();
+   					setupFrame = new GameSetupFrame(model);
+   					frame.dispose();
    				}
    			}
    		});
@@ -194,6 +200,7 @@ public class GUI {
 			"assets/dice_5.png",
 			"assets/dice_6.png"));
 
+	
 	/*
 	 * Rolls the dice
 	 */
@@ -268,8 +275,8 @@ public class GUI {
 		g.setFont(font);
 		g.drawString("Rolled "+((int)roll1+(int)roll2), 220, 50);
 		model.setPlayerSteps(roll1+roll2);
-		actionControl.enableMove(true);
-		actionControl.enableRoll(false);
+		actionControl.setMove(true);
+		actionControl.setRoll(false);
 	}
     
     /*
@@ -285,8 +292,8 @@ public class GUI {
 		JOptionPane.showOptionDialog(null, panel, "CURRENT TURN!", JOptionPane.DEFAULT_OPTION,
 		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 		this.setStatus(p.getUsername()+"'s Turn as "+p.getName());
-		actionControl.enableMove(false);
-		actionControl.enableRoll(true);
+		actionControl.setMove(false);
+		actionControl.setRoll(true);
     }
     public void setStatus(String msg) {this.playerTurnLabel.setText(msg);}
     
@@ -314,13 +321,15 @@ public class GUI {
     	JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
     	if (selection == 0) {
     		setStatus("You are currently Refuting");
-    		setMode("REFUTING");
+    		setMode("Refute");
     		model.gatherPossibleCards();
     		model.triggerChoose();
     		return false;
     	} else if (selection == 1) {
     		setStatus("You are currently Accusing");
-    		setMode("Accusing");
+    		setMode("Accuse");
+    		model.gatherPossibleCards();
+    		model.triggerChoose();
     		return false;
     	}
     	return true;
@@ -328,22 +337,53 @@ public class GUI {
 
 
     public void checkLogic() {
-    	if (refuteAccuse.getTitle().equals("REFUTING")) {
+    	if (refuteAccuse.getTitle().equals("Refute")) {
     		model.onRefute();
-    	} else if (refuteAccuse.getTitle().equals("ACCUSING")) {
-    		model.onAccusation(null);
+    	} else if (refuteAccuse.getTitle().equals("Accuse")) {
+    		model.onAccuse();
     	}
     }
 
 	/**
-	 * Show cards on HUD
+	 * Show cards on Refute & Accuse State
 	 * @param cards
 	 */
 	public void showCards(List<Card> cards) {
-    	refuteAccuse.showCards(cards);
+		refuteAccuse.getContentPane().removeAll();
+		refuteAccuse.repaint();
+		refuteAccuse.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+		ButtonGroup cardGroup = new ButtonGroup();
+		for (Card c: cards) {
+			ImageIcon icon = new ImageIcon(c.getCardImage());
+			JRadioButton card = new JRadioButton();
+			card.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+			    	String[] options = {"YES", "NO"};
+			    	JPanel panel = new JPanel();
+			    	JLabel label = new JLabel("Are you sure you want to pick "+c);
+			    	panel.add(label);
+			    	int selection = JOptionPane.showOptionDialog(null, panel, "Confirm Decision", JOptionPane.DEFAULT_OPTION, 
+			    	JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+			    	if (selection == 0) {
+			    		model.setChosenCard(c);
+			    		refuteAccuse.setVisible(false);
+			    		model.triggerChoose();
+			    	} else return;
+				}
+			});
+			card.setIcon(icon);
+			cardGroup.add(card);
+			refuteAccuse.add(card);
+		}
+		
+		refuteAccuse.pack();
+		refuteAccuse.setVisible(true);
     }
 
     public void setMode(String mode) {this.refuteAccuse.setTitle(mode);}
+    public String getMode() {return this.refuteAccuse.getTitle();}
 
     /*
      * Shows the hand of the current play.
@@ -367,6 +407,12 @@ public class GUI {
      */
     public Graphics2D getGraphics() {
     	return (Graphics2D)this.drawing.getGraphics();
+    }
+    
+    public void disableGUI() {
+    	this.setStatus("Game has Ended");
+    	actionControl.setRoll(false);
+    	actionControl.setMove(false);
     }
     
 }

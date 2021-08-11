@@ -51,7 +51,7 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 			}
 		});
 		
-		String[] options = {"2 Players","3 Players","4 Players"};
+		String[] options = {"3 Players","4 Players"};
 		JComboBox playerCount = new JComboBox(options);
 		
 		JButton confirmBtn = new JButton("Continue");

@@ -28,14 +28,14 @@ public class ActionPanel extends JPanel {
 		initialise();
 	}
 	
-	public void enableMove(boolean status) {
+	public void setMove(boolean status) {
 		west.setEnabled(status);
 		east.setEnabled(status);
 		north.setEnabled(status);
 		south.setEnabled(status);
 	}
 	
-	public void enableRoll(boolean status) {
+	public void setRoll(boolean status) {
 		roll.setEnabled(status);
 	}
 

@@ -170,6 +170,7 @@ public class Player {
      * Check whether this player still has steps
      */
     public boolean hasRemainingSteps() {
+    	if (!this.inGame) return false;
         return this.stepsRemaining > 0;
     }
     
