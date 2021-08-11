@@ -4,6 +4,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
+/**
+ * A Tile representing a pillar or a wall of an estate. Are obstructions the player cannot
+ * walk through
+ */
 public class Wall implements Tile{
 	
 	/**

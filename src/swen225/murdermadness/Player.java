@@ -9,8 +9,7 @@ import swen225.murdermadness.cards.*;
 import swen225.murdermadness.view.Position;
 
 /**
- * Represent the Player of a particular round
- * @author grantrona
+ * Represents the Player of a particular round
  */
 
 public class Player {
@@ -76,6 +75,7 @@ public class Player {
 	private List<Card> hand;
 	private Set<Card> eliminations;
 	public boolean inGame;
+	private boolean skipping = false;
 
 	/**
 	 * @return A String containing the descriptions of all the cards in the current players hand
@@ -215,6 +215,14 @@ public class Player {
     	this.prevPositions.add(this.pos);
     	this.pos = nextPos;
     }
+
+    public void skippingGuess(boolean skipping){
+    	this.skipping = skipping;
+	}
+
+	public boolean isSkippingGuess(){
+    	return skipping;
+	}
     
     public void setImg(BufferedImage img) {
     	this.playerIcon = img;

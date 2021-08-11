@@ -1,4 +1,5 @@
 package swen225.murdermadness;
+import java.awt.*;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -7,6 +8,10 @@ import swen225.murdermadness.cards.WeaponCard;
 import swen225.murdermadness.view.Board;
 import swen225.murdermadness.view.Position;
 
+
+/**
+ * Represents an Estate on the board. Contains a list of Weapons that are also within the Estate
+ */
 public class Estate {
 	private final String estateName;
 	public List<WeaponCard> weapons = new ArrayList<WeaponCard>();
@@ -71,5 +76,9 @@ public class Estate {
 					&& this.botRight.equals(e.botRight);
 		} 
 		return false;
+	}
+
+	public void redraw(Graphics2D g){
+
 	}
 }

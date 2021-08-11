@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.*;
@@ -16,63 +18,70 @@ import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.Player;
 import swen225.murdermadness.cards.Card;
 
-public class GUI {  
+/**
+ * The main GUI which contains the board and all the players and other obects on the board
+ * Main frame is split into panels that controls player action,
+ * a panel to display eliminations and a panel to display the user HUD. Finally a menu is added to the frame, which allows
+ * the player to quit or start a new game.
+ */
+public class GUI {
 
 	private MurderMadness model;
 	private GameSetupFrame setupFrame;
 	private RefuteAccuseFrame refuteAccuse;
-	
+
 	private JFrame frame;
 	private ActionPanel actionControl;
-	
-	
+
 	private JLabel playerTurnLabel;
-	
+
 	private JPanel drawing;
 	private JPanel userHUD;
 
 	private static final int DFLT_GUI_WIDTH = 900;
 	private static final int DFLT_GUI_HEIGHT = 840;
-	
+
 	private static final int DFLT_DRAWING_WIDTH = 700;
 	private static final int DFLT_DRAWING_HEIGHT = 600;
-	
+
 	private static Color BACKGROUND_COLOR = new Color(120, 116, 119);
-	
+
 	public GUI(MurderMadness model) {
 		this.model = model;
 		setupFrame = new GameSetupFrame(model);
 		refuteAccuse = new RefuteAccuseFrame(model);
 	}
-	
-	
+
+	/**
+	 * Initialise the main GUI
+	 */
     public void initMainGUI() {
 
-    	// Action Buttons 
+    	// Action Buttons
     	actionControl = new ActionPanel(model, this);
-    	
+
 		playerTurnLabel = new JLabel();
 		playerTurnLabel.setText("A Game of MurderMadness has Started!");
 		playerTurnLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
-		
+
 		JLabel eliminationLabel = new JLabel();
 		eliminationLabel.setText("Elimination Sheet");
 		eliminationLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		
+
 		JPanel controls = new JPanel();
     	controls.setLayout(new BoxLayout(controls, BoxLayout.LINE_AXIS));
 
     	Border edge = BorderFactory.createEmptyBorder(5, 5, 5, 5);
     	controls.setBorder(edge);
-    	
+
     	controls.setLayout(new GridLayout(1, 6));
     	controls.add(actionControl);
-    	
+
     	JPanel labels = new JPanel();
     	labels.setLayout(new BorderLayout());
     	labels.add(playerTurnLabel, BorderLayout.WEST);
     	labels.add(eliminationLabel, BorderLayout.EAST);
-    	
+
     	// Top Horizontal Row Panels
     	JSplitPane topPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     	topPanel.setEnabled(false);
@@ -88,7 +97,7 @@ public class GUI {
     		}
     	};
     	drawing.setPreferredSize(new Dimension(DFLT_DRAWING_WIDTH,DFLT_DRAWING_HEIGHT));
-	
+
     	// Inner UserHud Graphics Pane
     	userHUD = new JPanel() {
     		@Override
@@ -96,7 +105,7 @@ public class GUI {
     			Graphics2D g2d = (Graphics2D) g;
     		}
     	};
-    	
+
     	JSplitPane innerPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     	innerPanel.setEnabled(false);
     	innerPanel.setTopComponent(drawing);
@@ -117,13 +126,13 @@ public class GUI {
     	frame.setLayout(new BorderLayout());
     	frame.add(topPanel, BorderLayout.NORTH);
     	frame.add(split, BorderLayout.CENTER);
-    		
+
     	JMenuBar menuBar = new JMenuBar();
     	JMenu menuTab = new JMenu("Menu");
 
    		JMenuItem newGameItem = new JMenuItem("New Game");
    		JMenuItem quitItem = new JMenuItem("Quit");
-   		
+
    		newGameItem.addActionListener(new ActionListener() {
    			public void actionPerformed(ActionEvent ev) {
    				setupFrame.dispose();
@@ -139,7 +148,7 @@ public class GUI {
    				}
    			}
    		});
-    		
+
    		quitItem.addActionListener(new ActionListener() {
     			public void actionPerformed(ActionEvent ev) {
    				String[] options = { "Exit", "Cancel" };
@@ -157,88 +166,104 @@ public class GUI {
    		menuTab.add(newGameItem);
    		menuTab.add(quitItem);
    		menuBar.add(menuTab);
-   		
+
     	frame.setJMenuBar(menuBar);
     	frame.setSize(DFLT_GUI_WIDTH, DFLT_GUI_HEIGHT);
     	frame.setLocationRelativeTo(null);
     	frame.setVisible(true);
 	}
-    
-    /*
-     * Rolls the dice
-     */
-    public void roll() {
-    	BufferedImage img1 = null;
-    	BufferedImage img2 = null;
-    	Animate.rollDice();
-    	Graphics2D g = (Graphics2D)this.userHUD.getGraphics();
-    	g.clearRect(0, 0, userHUD.getWidth(), userHUD.getHeight()); // Clears the panel before drawing
-    	// Start Drawing the dice - Temporary of course
-    	int roll1 = (int) (((Math.random() * 6) + 1));
-    	int roll2 = (int) (((Math.random() * 6) + 1));
-    	switch(roll1) {
-    	  case 1:
-    		  img1 = model.grabAsset("assets/dice_1.png");
-    	    break;
-    	  case 2:
-    		  img1 = model.grabAsset("assets/dice_2.png");
-    		  break;
-    	  case 3:
-    		  img1 = model.grabAsset("assets/dice_3.png");
-      	    break;
-      	  case 4:
-      		  img1 = model.grabAsset("assets/dice_4.png");
-      		 break;
-    	  case 5:
-    		  img1 = model.grabAsset("assets/dice_5.png");
-      	    break;
-      	  case 6:
-      		  img1 = model.grabAsset("assets/dice_6.png");
-    	    break;
-    	  default:
-    	    // code block
-    	}
-    	switch(roll2) {
-  	  case 1:
-  		  img2 = model.grabAsset("assets/dice_1.png");
-  	    break;
-  	  case 2:
-  		  img2 = model.grabAsset("assets/dice_2.png");
-  		  break;
-  	  case 3:
-  		  img2 = model.grabAsset("assets/dice_3.png");
-    	    break;
-    	  case 4:
-          img2 = model.grabAsset("assets/dice_4.png");
-    		 break;
-  	  case 5:
-  		  img2 = model.grabAsset("assets/dice_5.png");
-    	    break;
-    	  case 6:
-          img2 = model.grabAsset("assets/dice_6.png");
-  	    break;
-  	  default:
-  	    // code block
-    	}
-    
-    	
-    	g.drawImage(img1, 0, 0, 100, 100, null);
-    	g.drawImage(img2, 100, 0, 100, 100, null);
-    	g.setColor(new Color(255,255,255));
-    	g.fillRect(200, 35, 100, 20);
-    	g.setColor(new Color(0,0,0));
-    	Font font = new Font("Helvetica", Font.BOLD, 15);
-    	g.setFont(font);
-    	g.drawString("Rolled "+((int)roll1+(int)roll2), 220, 50);
-    	model.setPlayerSteps(roll1+roll2);
-    	actionControl.enableMove(true);
-        actionControl.enableRoll(false);
-    }
+
+	private List<String> dicePicPath = new ArrayList<String>(Arrays.asList("assets/dice_1.png",
+			"assets/dice_2.png",
+			"assets/dice_3.png",
+			"assets/dice_4.png",
+			"assets/dice_5.png",
+			"assets/dice_6.png"));
+
+	/*
+	 * Rolls the dice
+	 */
+	public void roll() {
+		BufferedImage img1 = null;
+		BufferedImage img2 = null;
+		BufferedImage img3 = null;
+		Graphics2D g = (Graphics2D)this.userHUD.getGraphics();
+		g.clearRect(0, 0, userHUD.getWidth(), userHUD.getHeight()); // Clears the panel before drawing
+		// Start Drawing the dice - Temporary of course
+		int roll1 = (int) (((Math.random() * 6) + 1));
+		int roll2 = (int) (((Math.random() * 6) + 1));
+		int x = 0;
+		for(int i = 0; i<200;i++) {
+			x = i%6;
+			img3 = model.grabAsset(dicePicPath.get(x));
+			g.clearRect(0, 0, userHUD.getWidth(), userHUD.getHeight());
+			g.drawImage(img3, 0, 0, 100, 100, null);
+			g.drawImage(img3, 100, 0, 100, 100, null);
+			g.drawString("Rolling......... ",220, 50);
+		}
+		switch(roll1) {
+			case 1:
+				img1 = model.grabAsset("assets/dice_1.png");
+				break;
+			case 2:
+				img1 = model.grabAsset("assets/dice_2.png");
+				break;
+			case 3:
+				img1 = model.grabAsset("assets/dice_3.png");
+				break;
+			case 4:
+				img1 = model.grabAsset("assets/dice_4.png");
+				break;
+			case 5:
+				img1 = model.grabAsset("assets/dice_5.png");
+				break;
+			case 6:
+				img1 = model.grabAsset("assets/dice_6.png");
+				break;
+			default:
+				// code block
+		}
+		switch(roll2) {
+			case 1:
+				img2 = model.grabAsset("assets/dice_1.png");
+				break;
+			case 2:
+				img2 = model.grabAsset("assets/dice_2.png");
+				break;
+			case 3:
+				img2 = model.grabAsset("assets/dice_3.png");
+				break;
+			case 4:
+				img2 = model.grabAsset("assets/dice_4.png");
+				break;
+			case 5:
+				img2 = model.grabAsset("assets/dice_5.png");
+				break;
+			case 6:
+				img2 = model.grabAsset("assets/dice_6.png");
+				break;
+			default:
+		}
+
+		g.drawImage(img1, 0, 0, 100, 100, null);
+		g.drawImage(img2, 100, 0, 100, 100, null);
+		g.setColor(new Color(255,255,255));
+		g.fillRect(200, 35, 100, 20);
+		g.setColor(new Color(0,0,0));
+		Font font = new Font("Helvetica", Font.BOLD, 15);
+		g.setFont(font);
+		g.drawString("Rolled "+((int)roll1+(int)roll2), 220, 50);
+		model.setPlayerSteps(roll1+roll2);
+		actionControl.enableMove(true);
+		actionControl.enableRoll(false);
+	}
     
     /*
      * Prompt Window for turns
      */
     public void onPlayerTurn(Player p) {
+		userHUD.getGraphics().clearRect(0,0, userHUD.getWidth(), userHUD.getHeight());
+
 		String[] options = {"Continue"};
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel("It is currently "+p.getUsername()+"'s Turn as "+p.getName());
@@ -266,7 +291,7 @@ public class GUI {
     /*
      * Prompt to show when player enters an estate
      */
-    public void onEstatePrompt(String title, String msg) {
+    public boolean onEstatePrompt(String title, String msg) {
     	String[] options = {"Refute", "Accuse", "Keep moving"};
     	JPanel panel = new JPanel();
     	JLabel label = new JLabel(msg);
@@ -278,13 +303,16 @@ public class GUI {
     		setMode("REFUTING");
     		model.gatherPossibleCards();
     		model.triggerChoose();
+    		return false;
     	} else if (selection == 1) {
     		setStatus("You are currently Accusing");
     		setMode("Accusing");
-    		
-    	} else return;
+    		return false;
+    	}
+    	return true;
     }
-    
+
+
     public void checkLogic() {
     	if (refuteAccuse.getTitle().equals("REFUTING")) {
     		model.onRefute();
@@ -292,12 +320,17 @@ public class GUI {
     		model.onAccusation(null);
     	}
     }
-    
-    public void showCards(List<Card> cards) {
+
+	/**
+	 * Show cards on HUD
+	 * @param cards
+	 */
+	public void showCards(List<Card> cards) {
     	refuteAccuse.showCards(cards);
     }
-    
+
     public void setMode(String mode) {this.refuteAccuse.setTitle(mode);}
+
     /*
      * Shows the hand of the current play.
      */

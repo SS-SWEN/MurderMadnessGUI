@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 
 /**
  * Card corresponding to a potential murder weapon
- * @author grantrona
  */
 
 public class WeaponCard implements Card{
@@ -33,7 +32,6 @@ public class WeaponCard implements Card{
 	 */
 	@Override
 	public BufferedImage getCardImage() {
-		// TODO Auto-generated method stub
 		try {
 			BufferedImage img = ImageIO.read(new File("assets/"+weaponName+"-card.png"));
 			return img;

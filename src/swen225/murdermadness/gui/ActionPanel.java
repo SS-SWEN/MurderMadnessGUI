@@ -11,6 +11,9 @@ import javax.swing.*;
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.MurderMadness.Direction;
 
+/**
+ * Panel contains buttons for actions for a player. Also contains the hotkey bindings for the same actions
+ */
 public class ActionPanel extends JPanel {
 
 	private MurderMadness model;
@@ -35,9 +38,11 @@ public class ActionPanel extends JPanel {
 	public void enableRoll(boolean status) {
 		roll.setEnabled(status);
 	}
-	
+
+	/**
+	 * Initialize the Action Panel
+	 */
 	public void initialise() {
-		
 		// Direction
     	west = new JButton("\u2190");
 		west.addActionListener(new ActionListener() {
@@ -108,28 +113,31 @@ public class ActionPanel extends JPanel {
 	 * Associate keys with actions using ActionMaps/InputMaps
 	 */
 	public void initKeyBindings(){
-		ActionMap am = this.getActionMap();
-		InputMap im = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		ActionMap actMap = this.getActionMap();
+		InputMap inMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
 		// associate inputs w,s,a,d and keyboard arrows with directions
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),"VK_LEFT");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),"VK_RIGHT");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),"VK_UP");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),"VK_DOWN");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0),"VK_A");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0),"VK_D");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0),"VK_W");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0),"VK_S");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),"VK_LEFT");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),"VK_RIGHT");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),"VK_UP");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),"VK_DOWN");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0),"VK_A");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0),"VK_D");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0),"VK_W");
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0),"VK_S");
+		//non movement inputs
+		inMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0),"VK_H");
 
 		// bind the directions with actions
-		am.put("VK_LEFT", new bindKey("LEFT"));
-		am.put("VK_RIGHT", new bindKey("RIGHT"));
-		am.put("VK_UP", new bindKey("UP"));
-		am.put("VK_DOWN", new bindKey("DOWN"));
-		am.put("VK_A", new bindKey("LEFT"));
-		am.put("VK_D", new bindKey("RIGHT"));
-		am.put("VK_W", new bindKey("UP"));
-		am.put("VK_S", new bindKey("DOWN"));
+		actMap.put("VK_LEFT", new bindKey("LEFT"));
+		actMap.put("VK_RIGHT", new bindKey("RIGHT"));
+		actMap.put("VK_UP", new bindKey("UP"));
+		actMap.put("VK_DOWN", new bindKey("DOWN"));
+		actMap.put("VK_A", new bindKey("LEFT"));
+		actMap.put("VK_D", new bindKey("RIGHT"));
+		actMap.put("VK_W", new bindKey("UP"));
+		actMap.put("VK_S", new bindKey("DOWN"));
+		actMap.put("VK_H", new bindKey("HAND"));
 	}
 
 	/**
@@ -144,19 +152,33 @@ public class ActionPanel extends JPanel {
 			if(!roll.isEnabled()) {
 				switch (ev.getActionCommand()) {
 					case ("LEFT"):
-						if (west.isEnabled()) { model.onPlayerMove(Direction.LEFT); }
+						if (west.isEnabled()) {
+							model.onPlayerMove(Direction.LEFT);
+							model.updateBoard(view.getGraphics());
+						}
 						break;
 					case ("RIGHT"):
-						if (east.isEnabled()) { model.onPlayerMove(Direction.RIGHT); }
+						if (east.isEnabled()) {
+							model.onPlayerMove(Direction.RIGHT);
+							model.updateBoard(view.getGraphics());
+						}
 						break;
 					case ("UP"):
-						if (north.isEnabled()) { model.onPlayerMove(Direction.UP); }
+						if (north.isEnabled()) {
+							model.onPlayerMove(Direction.UP);
+							model.updateBoard(view.getGraphics());
+						}
 						break;
 					case ("DOWN"):
-						if (south.isEnabled()) { model.onPlayerMove(Direction.DOWN); }
+						if (south.isEnabled()) {
+							model.onPlayerMove(Direction.DOWN);
+							model.updateBoard(view.getGraphics());
+						}
+						break;
+					case ("HAND"):
+						view.showHand();
 						break;
 				}
-				model.updateBoard(view.getGraphics());
 			}
 		}
 	}

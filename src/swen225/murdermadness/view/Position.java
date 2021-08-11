@@ -2,6 +2,9 @@ package swen225.murdermadness.view;
 
 import swen225.murdermadness.Player;
 
+/**
+ * An x,y position on the board
+ */
 public class Position {
 	
 	private int x;

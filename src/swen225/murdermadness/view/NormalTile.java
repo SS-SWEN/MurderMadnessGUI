@@ -7,6 +7,9 @@ import java.awt.image.BufferedImage;
 
 import swen225.murdermadness.Player;
 
+/**
+ * A tile that is empty (player can walk on)
+ */
 public class NormalTile implements Tile{
 	
 	/**

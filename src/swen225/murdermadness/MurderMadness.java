@@ -98,8 +98,11 @@ public class MurderMadness {
     public void updateBoard(Graphics2D g) {
     	board.show(g);
     }
-    
-    public boolean endOfCycle() {
+
+	/**
+	 * Check if all players have had their turn for this round
+	 */
+	public boolean endOfCycle() {
     	if (currentPlayer == players.size()) {
     		// Cycled through all the players
     		currentPlayer = 0;
@@ -107,7 +110,6 @@ public class MurderMadness {
     	}
     	return false;
     }
-
     
     /**
 	 * Ask the player which direction to move. Player is then
@@ -119,6 +121,7 @@ public class MurderMadness {
     		if (dir != null) view.onPrompt("INFO", "You have run out of Steps!");
     		else view.onPrompt("INFO", "Your turn has ended!");
     		p.resetPrev();
+			p.skippingGuess(false);
 
     		currentPlayer++; // Player cannot move, go next player
     		endOfCycle(); // Check if Cycle ended
@@ -141,13 +144,17 @@ public class MurderMadness {
 	        default:
 	            break;
 		}
-		
+
+    	// return if player does not want to make a guess/accusation this turn
+		if(p.isSkippingGuess()){ return; }
+
+		// check if the player has entered any estate
 		for (Card card : allCards.values()) {
 			if(card instanceof EstateCard) {
 				EstateCard es = (EstateCard)card;
 				if(es.getEstate().within(p.getPos())) {
 					p.setEstate(es.getEstate());
-					view.onEstatePrompt("ESTATE PROMPT", "You have entered the "+es);
+					p.skippingGuess(view.onEstatePrompt("ESTATE PROMPT", "You have entered the "+es));
 				}
 			}
     	}
@@ -418,8 +425,7 @@ public class MurderMadness {
     		}
     	}
     }
-    
-    
+
     private WeaponCard chosenWeapon = null;
     private CharacterCard chosenCharacter = null;
     private Pair<List<Card>, List<Card>> possibleCards;

@@ -12,6 +12,9 @@ import swen225.murdermadness.Estate;
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.Player;
 
+/**
+ * Board in which the main game takes place in. Each square is represented by a Tile
+ */
 public class Board {
 	
 	private MurderMadness model;
@@ -287,7 +290,7 @@ public class Board {
     public boolean movePlayer(Player player, Direction direction, int steps) {
     	for (int i = 0;i < steps;i++) {
     		Tile next = getNewLocation(player.getPos(), direction);
-    		
+
     		// return false to state an invalid movement of player
     		if(next == null) { 
     			return false; 
@@ -299,11 +302,13 @@ public class Board {
     		if(player.getPrevPos().contains(next.getPos())) {
     			System.out.println("This position has already been visited this turn!");
     			return false;
-    		}	
-    		if(!next.getCharacter().equals(".")) { 
-    			System.out.println("A character is already in this spot!");
-    			return false;
     		}
+    		for(Player p  : model.getPlayers()){
+    			if(p.getPos().equals(next.getPos())){
+					System.out.println("A character is already in this spot!");
+    				return false;
+				}
+			}
 	    	player.updateLocation(next.getPos());
 	    	player.decrementStep();
     	}

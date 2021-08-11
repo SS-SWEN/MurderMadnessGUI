@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.lang.reflect.Field;
 
 
-
 public interface Tile {
 	
 	public static final int TILE_WIDTH = 25;
