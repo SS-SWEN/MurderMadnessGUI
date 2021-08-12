@@ -5,9 +5,18 @@ import java.util.Map;
 
 public interface Observer {
 
-    void onNotify(Subject.Event event);
+    /**
+     * Update in response to an event,
+     */
+    void update(Subject.Event event);
 
-    void onNotify(Object obj, Subject.Event event);
+    /**
+     * Update in response to an event, using passed Object passed as required
+     */
+    void update(Object obj, Subject.Event event);
 
-    void onNotify(Map<String, String> collection, BufferedImage img, Subject.Event event);
+    /**
+     * Retrieve object an as required
+     */
+    Object retrieve(Subject.Event obj);
 }
