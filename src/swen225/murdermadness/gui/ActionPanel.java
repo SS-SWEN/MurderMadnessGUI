@@ -5,25 +5,28 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import javax.swing.*;
 
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.MurderMadness.Direction;
+import swen225.murdermadness.Observer;
+import swen225.murdermadness.Subject;
 
 /**
  * Panel contains buttons for actions for a player. Also contains the hotkey bindings for the same actions
  */
-public class ActionPanel extends JPanel {
+public class ActionPanel extends JPanel implements Subject {
 
-	private MurderMadness model;
+	private final List<Observer> observers;
 	private GUI view;
 	
 	private JButton roll, hand;
 	private JButton west, east, north, south;
 	
-	public ActionPanel(MurderMadness model, GUI view) {
-		this.model = model;
+	public ActionPanel(List<Observer> observers, GUI view) {
+		this.observers = observers;
 		this.view = view;
 		initialise();
 	}
@@ -48,8 +51,8 @@ public class ActionPanel extends JPanel {
 		west.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				model.onPlayerMove(Direction.LEFT);
-				model.updateBoard(view.getGraphics());
+				ActionPanel.this.notify(Event.LEFT);
+				ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 			}
 		});west.setEnabled(false);
 
@@ -57,8 +60,8 @@ public class ActionPanel extends JPanel {
 		east.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				model.onPlayerMove(Direction.RIGHT);
-				model.updateBoard(view.getGraphics());
+				ActionPanel.this.notify(Event.RIGHT);
+				ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 			}
 		});east.setEnabled(false);
 
@@ -66,8 +69,8 @@ public class ActionPanel extends JPanel {
 		north.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				model.onPlayerMove(Direction.UP);
-				model.updateBoard(view.getGraphics());
+				ActionPanel.this.notify(Event.UP);
+				ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 			}
 		});north.setEnabled(false);
 
@@ -75,8 +78,8 @@ public class ActionPanel extends JPanel {
 		south.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ev) {
-				model.onPlayerMove(Direction.DOWN);
-				model.updateBoard(view.getGraphics());
+				ActionPanel.this.notify(Event.DOWN);
+				ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 			}
 		});south.setEnabled(false);
 
@@ -153,26 +156,27 @@ public class ActionPanel extends JPanel {
 				switch (ev.getActionCommand()) {
 					case ("LEFT"):
 						if (west.isEnabled()) {
-							model.onPlayerMove(Direction.LEFT);
-							model.updateBoard(view.getGraphics());
+							ActionPanel.this.notify(Event.LEFT);
+							ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 						}
 						break;
 					case ("RIGHT"):
 						if (east.isEnabled()) {
-							model.onPlayerMove(Direction.RIGHT);
-							model.updateBoard(view.getGraphics());
+							ActionPanel.this.notify(Event.RIGHT);
+							ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 						}
 						break;
 					case ("UP"):
 						if (north.isEnabled()) {
-							model.onPlayerMove(Direction.UP);
-							model.updateBoard(view.getGraphics());
+							ActionPanel.this.notify(Event.UP);
+							ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 						}
+
 						break;
 					case ("DOWN"):
 						if (south.isEnabled()) {
-							model.onPlayerMove(Direction.DOWN);
-							model.updateBoard(view.getGraphics());
+							ActionPanel.this.notify(Event.DOWN);
+							ActionPanel.this.notify(view.getGraphics(), Event.UPDATE_BOARD);
 						}
 						break;
 					case ("HAND"):
@@ -181,6 +185,26 @@ public class ActionPanel extends JPanel {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void notify(Event event) {
+		for(Observer o : observers){
+			o.update(event);
+		}
+	}
+
+	@Override
+	public void notify(Object obj, Event event) {
+		for(Observer o : observers){
+			o.update(obj, event);
+		}
+	}
+
+	@Override
+	public Object request(Event object) {
+		//not used
+		return null;
 	}
 
 }

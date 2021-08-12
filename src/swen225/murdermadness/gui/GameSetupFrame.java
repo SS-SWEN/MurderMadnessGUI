@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
@@ -17,16 +18,18 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
 import swen225.murdermadness.MurderMadness;
+import swen225.murdermadness.Observer;
+import swen225.murdermadness.Subject;
 
-public class GameSetupFrame extends JFrame implements ActionListener {
+public class GameSetupFrame extends JFrame implements ActionListener, Subject {
 	
-	private MurderMadness model;
+	List<Observer> observers;
 	
 	private int players = 0;
 	private Map<String, String> allPlayers;
 	
-	public GameSetupFrame(MurderMadness model) {
-		this.model = model;
+	public GameSetupFrame(List<Observer> observers) {
+		this.observers = observers;
 		initNumPlayers();
 	}
 	
@@ -165,7 +168,7 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 		this.setTitle("Character Selection: Player "+count);
 		if (count == players) {
 			this.setVisible(false);
-			model.setup(allPlayers);
+			notify(allPlayers, Event.SETUP);
 			this.dispose();
 			nameInput.dispose();
 			return;
@@ -177,5 +180,25 @@ public class GameSetupFrame extends JFrame implements ActionListener {
 	
 	public Map<String, String> getPlayers(){
 		return this.allPlayers;
+	}
+
+	@Override
+	public void notify(Event event) {
+		for(Observer o : observers){
+			o.update(event);
+		}
+	}
+
+	@Override
+	public void notify(Object obj, Event event) {
+		for(Observer o : observers){
+			o.update(obj, event);
+		}
+	}
+
+	@Override
+	public Object request(Event object) {
+		//not used
+		return null;
 	}
 }
