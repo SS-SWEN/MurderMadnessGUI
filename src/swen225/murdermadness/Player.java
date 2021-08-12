@@ -16,9 +16,9 @@ public class Player {
 
 	//TODO Redraw methods (Tile AND Player) could be put a separate class?
 	public static final int TILE_WIDTH = 25;
-	public static final int TILE_HEIGHT = 25;
+	public static final int IMG_SIZE = 35;
 	public static final int LEFT_PADDING= (getBoardWidth() - (24 * TILE_WIDTH))/2;
-	public static final int TOP_PADDING = (getBoardHeight() - (24 * TILE_HEIGHT))/2;
+	public static final int TOP_PADDING = (getBoardHeight() - (24 * TILE_WIDTH))/2;
 	static private int getBoardWidth() {
 		try
 		{
@@ -232,17 +232,18 @@ public class Player {
     public BufferedImage getIcon(){ return this.playerIcon; }
 
 	public void redraw(Graphics2D g) {
-		g.drawImage(playerIcon, (pos.getX()*TILE_WIDTH)+LEFT_PADDING,
-				(pos.getY()*TILE_HEIGHT)-TOP_PADDING,
-				TILE_WIDTH,
-				TILE_HEIGHT,
+		g.drawImage(playerIcon,
+				(pos.getX()*TILE_WIDTH)+LEFT_PADDING-3,
+				(pos.getY()*TILE_WIDTH)-TOP_PADDING-5,
+				IMG_SIZE,
+				IMG_SIZE,
 				null);
 		for(Position p: prevPositions){
 			g.setPaint(Color.RED);
 			g.drawLine((p.getX()*TILE_WIDTH)+LEFT_PADDING,
-					(p.getY()*TILE_HEIGHT)-TOP_PADDING,
+					(p.getY()*TILE_WIDTH)-TOP_PADDING,
 					((p.getX()*TILE_WIDTH)+LEFT_PADDING)+TILE_WIDTH,
-					((p.getY()*TILE_HEIGHT)-TOP_PADDING)+TILE_HEIGHT);
+					((p.getY()*TILE_WIDTH)-TOP_PADDING)+TILE_WIDTH);
 		}
 	}
 }

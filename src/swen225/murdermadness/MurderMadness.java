@@ -71,7 +71,7 @@ public class MurderMadness {
     	for (Entry<String, String> et: playerList.entrySet()) {
     		Player p = new Player(et.getKey(), et.getValue());
     		players.add(p);
-    		p.setImg(this.grabAsset("assets/player-placeholder.png"));
+    		p.setImg(this.grabAsset("assets/player-"+p.getName().toLowerCase()+".png"));
 			switch(et.getValue()){
 				case("Lucilla"):
 					p.setPos(new Position(11,1));
@@ -310,7 +310,7 @@ public class MurderMadness {
     	EstateCard estateCard = (EstateCard)allCards.get(currentEstate.getName());
 
 		if (chosenWeapon == null && chosenCharacter == null) return;
-		view.onPrompt("Chosen Cards to Refute", chosenWeapon+" & "+chosenCharacter+" in the "+estateCard);
+		view.onPrompt("Chosen Cards to Accuse", chosenWeapon+" & "+chosenCharacter+" in the "+estateCard);
 		
 		Set<Card> chosenCards = new HashSet<Card>();
 		chosenCards.add(chosenWeapon);chosenCards.add(chosenCharacter);chosenCards.add(estateCard);
@@ -328,13 +328,13 @@ public class MurderMadness {
     /*
      * A player attempts to guess a card that may or may not exist in the murder scenario.
      */
-    public void onRefute() {
+    public void onGuess() {
     	Player p = players.get(currentPlayer);
     	Estate currentEstate = p.getEstate();
     	EstateCard estateCard = (EstateCard)allCards.get(currentEstate.getName());
 
 		if (chosenWeapon == null && chosenCharacter == null) return;
-		view.onPrompt("Chosen Cards to Refute", chosenWeapon+" & "+chosenCharacter+" in the "+estateCard);
+		view.onPrompt("Chosen Cards to Guess", chosenWeapon+" & "+chosenCharacter+" in the "+estateCard);
 		
 		// Move Cards into Current Estate
 		// remove weapon from one estate, and move it to this estate
@@ -369,7 +369,7 @@ public class MurderMadness {
     		if (!options.isEmpty()) {
     			// Grab the first card that is refutable
     			refutedCard = options.get(0);
-    			view.onPrompt("Refuting", otherPlayer+" has refuted one of your guesses: \n"+refutedCard+" is no longer part of the MurderSolution");
+    			view.onPrompt("Refuting", otherPlayer+" has refuted one of your guesses: \n"+refutedCard+" is no longer part of the Murder Solution");
     			p.addToEliminations(refutedCard); // Updates Elimination Sheet
 		    	break;
     		}
@@ -392,14 +392,14 @@ public class MurderMadness {
     		view.onPrompt("INFO", "Choose a Character to "+view.getMode());
     		view.showCards(possibleCards.getRight());   		
     	} else {
-    		view.checkLogic();;
+    		view.checkLogic();
     	}
     }
     
     /*
      * Set the selected Card
      * 
-     * - Used for refute and accusations
+     * - Used for guess and accusations
      */
     public void setChosenCard(Card card) {
     	if (card instanceof WeaponCard) {
@@ -439,6 +439,8 @@ public class MurderMadness {
     	public K getLeft() {return this.a;}
     	public V getRight() {return this.b;}
     }
+
+
     
 	public static void main(String[] args) {
 		new MurderMadness();

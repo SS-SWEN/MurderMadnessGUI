@@ -28,7 +28,7 @@ public class GUI {
 
 	private MurderMadness model;
 	private GameSetupFrame setupFrame;
-	private JFrame refuteAccuse;
+	private JFrame guessAccuse;
 
 	private JFrame frame;
 	private ActionPanel actionControl;
@@ -57,11 +57,11 @@ public class GUI {
     public void initMainGUI() {
     	
     	// Initialize Refute & Accuse Window
-    	refuteAccuse = new JFrame();
-    	refuteAccuse.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    	refuteAccuse.setResizable(false);
-    	refuteAccuse.setSize(300,160);
-    	refuteAccuse.setLocationRelativeTo(null);
+		guessAccuse = new JFrame();
+		guessAccuse.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		guessAccuse.setResizable(false);
+		guessAccuse.setSize(300,160);
+		guessAccuse.setLocationRelativeTo(null);
     	
     	// Action Buttons
     	actionControl = new ActionPanel(model, this);
@@ -320,7 +320,7 @@ public class GUI {
      * Prompt to show when player enters an estate
      */
     public boolean onEstatePrompt(String title, String msg) {
-    	String[] options = {"Refute", "Accuse", "Keep moving"};
+    	String[] options = {"Guess", "Accuse", "Keep moving"};
     	JPanel panel = new JPanel();
     	JLabel label = new JLabel(msg);
     	panel.add(label);
@@ -328,7 +328,7 @@ public class GUI {
     	JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
     	if (selection == 0) {
     		setStatus("You are currently Refuting");
-    		setMode("Refute");
+    		setMode("Guess");
     		model.gatherPossibleCards();
     		model.triggerChoose();
     		return false;
@@ -344,21 +344,21 @@ public class GUI {
 
 
     public void checkLogic() {
-    	if (refuteAccuse.getTitle().equals("Refute")) {
-    		model.onRefute();
-    	} else if (refuteAccuse.getTitle().equals("Accuse")) {
+    	if (guessAccuse.getTitle().equals("Guess")) {
+    		model.onGuess();
+    	} else if (guessAccuse.getTitle().equals("Accuse")) {
     		model.onAccuse();
     	}
     }
 
 	/**
-	 * Show cards on Refute & Accuse State
+	 * Show cards on Guess & Accuse State
 	 * @param cards
 	 */
 	public void showCards(List<Card> cards) {
-		refuteAccuse.getContentPane().removeAll();
-		refuteAccuse.repaint();
-		refuteAccuse.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+		guessAccuse.getContentPane().removeAll();
+		guessAccuse.repaint();
+		guessAccuse.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
 		ButtonGroup cardGroup = new ButtonGroup();
 		for (Card c: cards) {
@@ -375,22 +375,23 @@ public class GUI {
 			    	JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 			    	if (selection == 0) {
 			    		model.setChosenCard(c);
-			    		refuteAccuse.setVisible(false);
+						guessAccuse.setVisible(false);
 			    		model.triggerChoose();
 			    	} else return;
 				}
 			});
 			card.setIcon(icon);
 			cardGroup.add(card);
-			refuteAccuse.add(card);
+			guessAccuse.add(card);
 		}
-		
-		refuteAccuse.pack();
-		refuteAccuse.setVisible(true);
+
+		guessAccuse.pack();
+		guessAccuse.setVisible(true);
     }
 
-    public void setMode(String mode) {this.refuteAccuse.setTitle(mode);}
-    public String getMode() {return this.refuteAccuse.getTitle();}
+    public void setMode(String mode) {this.guessAccuse.setTitle(mode);}
+
+    public String getMode() {return this.guessAccuse.getTitle();}
 
     /*
      * Shows the hand of the current play.
