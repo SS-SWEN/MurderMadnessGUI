@@ -15,6 +15,7 @@ class MurderMadness{
       
       Move{
         [validMove()] move/ {report("Moving Player");} -> Move;
+        [outOfSteps] -> NextPlayer;
         [inEstate] moveToEstate -> inRoom;
       }
     
@@ -35,10 +36,11 @@ class MurderMadness{
         }
        
          Refute{
-           [hasRefutation] refuted -> NextPlayer;
+           endOfTurn -> NextPlayer;
         }
+        
+        
       }
-      
       
       Accuse{
         ChooseCards{
@@ -54,11 +56,11 @@ class MurderMadness{
     
     Lost{
       entry/{report("Player has lost the game");}
-      [gameOngoing] -> PlayerTurn;
+      [gameOngoing] -> NextPlayer;
       }
     
     }
-}//$?[End_of_model]$?
+}
 
 namespace -;
 
@@ -70,4 +72,4 @@ class MurderMadness
 class MurderMadness
 {
   position 50 30 109 45;
-}
+}//$?[End_of_model]$?
