@@ -100,14 +100,6 @@ public class MurderMadness {
     	board.show(g);
     }
     
-    /*
-     * Redraws Elimination Tab
-     */
-    public void updateElimination(Graphics2D g) {
-    	for (Player p: players) {
-    		p.redraw(g);
-    	}
-    }
 
 	/**
 	 * Check if all players have had their turn for this round
@@ -274,6 +266,7 @@ public class MurderMadness {
 		while(!remaining.isEmpty()) {
 			for(Player p : players) {
 				if(remaining.isEmpty()) { break; }
+				p.addToEliminations(remaining.get(0));
 				p.addToHand(remaining.get(0));
 				remaining.remove(0);
 			}
@@ -426,6 +419,14 @@ public class MurderMadness {
      */
     public Player getCurrentPlayer() {
     	return players.get(currentPlayer);
+    }
+    
+    
+    /*
+     * Gets the current Player.
+     */
+    public Map<String, Card> getAllCards() {
+    	return allCards;
     }
     
     // Small Implementation of a Pair Class

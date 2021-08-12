@@ -1,18 +1,15 @@
 package swen225.murdermadness.gui;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.text.DefaultCaret;
 
 import swen225.murdermadness.MurderMadness;
 import swen225.murdermadness.Player;
@@ -37,6 +34,7 @@ public class GUI {
 
 	private JPanel drawing;
 	private JPanel userHUD;
+	private JPanel rightPanel;
 
 	private static final int DFLT_GUI_WIDTH = 900;
 	private static final int DFLT_GUI_HEIGHT = 840;
@@ -70,10 +68,6 @@ public class GUI {
 		playerTurnLabel.setText("A Game of MurderMadness has Started!");
 		playerTurnLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
 
-		JLabel eliminationLabel = new JLabel();
-		eliminationLabel.setText("Elimination Sheet");
-		eliminationLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-
 		JPanel controls = new JPanel();
     	controls.setLayout(new BoxLayout(controls, BoxLayout.LINE_AXIS));
 
@@ -86,7 +80,6 @@ public class GUI {
     	JPanel labels = new JPanel();
     	labels.setLayout(new BorderLayout());
     	labels.add(playerTurnLabel, BorderLayout.WEST);
-    	labels.add(eliminationLabel, BorderLayout.EAST);
 
     	// Top Horizontal Row Panels
     	JSplitPane topPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -118,14 +111,25 @@ public class GUI {
     	innerPanel.setBottomComponent(userHUD);
 
     	// Right Panel Elimination Sheet Graphics Pane
-    	JPanel rightPanel = new JPanel() {
+    	rightPanel = new JPanel() {
     		@Override
     		public void paintComponent(Graphics g) {
     			Graphics2D g2d = (Graphics2D) g;
-    			model.updateElimination(g2d);
     		}
     	};
     	rightPanel.setBackground(BACKGROUND_COLOR);
+    	rightPanel.setLayout(new BorderLayout());
+    	JLabel eliminationLabel = new JLabel();
+    	eliminationLabel.setText("Elimination Sheet");
+    	eliminationLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+    	JLabel potentialLabel = new JLabel();
+    	potentialLabel.setText("Potential Sheet");
+    	potentialLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+    	
+    	rightPanel.add(eliminationLabel, BorderLayout.NORTH);
+    	rightPanel.add(potentialLabel, BorderLayout.CENTER);
+  
 
     	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     	split.setEnabled(false);
@@ -291,13 +295,15 @@ public class GUI {
      */
     public void onPlayerTurn(Player p) {
 		userHUD.getGraphics().clearRect(0,0, userHUD.getWidth(), userHUD.getHeight());
-
+		
 		String[] options = {"Continue"};
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel("It is currently "+p.getUsername()+"'s Turn as "+p.getName());
 		panel.add(label);
 		JOptionPane.showOptionDialog(null, panel, "CURRENT TURN!", JOptionPane.DEFAULT_OPTION,
 		JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+		showElimination();
+		showPotential();
 		this.setStatus(p.getUsername()+"'s Turn as "+p.getName());
 		actionControl.setMove(false);
 		actionControl.setRoll(true);
@@ -407,6 +413,50 @@ public class GUI {
     	for (Card c : hand) {
     		g.drawImage(c.getCardImage(), padding, 0, 100, 100, null);
     		padding += 110;
+    	}
+    }
+    
+    /*
+     * Shows the elimination cards of the current player, this includes their own hand.
+     */
+    
+    public void showElimination() {
+    	Graphics2D g = (Graphics2D)this.rightPanel.getGraphics();
+    	g.clearRect(0, 20, rightPanel.getWidth(), rightPanel.getHeight()/2-50); // Clears the panel before drawing
+    	Player p = model.getCurrentPlayer();
+    	Set<Card> eliminations = p.getEliminations();
+    	int paddingX = 1;
+    	int paddingY = 30;
+    	int gap = 5;
+    	for (Card c : eliminations) {
+    		if (paddingX + gap > this.rightPanel.getWidth()) {
+    			paddingX = 1;
+    			paddingY += 55;
+    		}
+    		g.drawImage(c.getCardImage(), paddingX, paddingY, 50, 50, null); 
+    		paddingX += 60;
+    	}
+    }
+    
+    public void showPotential() {
+    	Graphics2D g = (Graphics2D)this.rightPanel.getGraphics();
+    	g.clearRect(0,  rightPanel.getHeight()/2+50, rightPanel.getWidth(), rightPanel.getHeight()); // Clears the panel before drawing
+    	Player p = model.getCurrentPlayer();
+    	Set<Card> eliminations = p.getEliminations();
+    	int paddingX = 1;
+    	int paddingY = rightPanel.getHeight()/2+30;
+    	int gap = 5;
+    
+    	
+    	for (Card c : model.getAllCards().values()) {
+    		if (!eliminations.contains(c)) {
+	    		if (paddingX + gap > this.rightPanel.getWidth()) {
+	    			paddingX = 1;
+	    			paddingY += 55;
+	    		}
+    		g.drawImage(c.getCardImage(), paddingX, paddingY, 50, 50, null); 
+    		paddingX += 60;
+    		}
     	}
     }
     
