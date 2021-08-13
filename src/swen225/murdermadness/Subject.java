@@ -4,11 +4,25 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 public interface Subject {
-    enum Event { LEFT,RIGHT,UP,DOWN,SETUP,UPDATE_BOARD,SET_STEPS,SHOW_HAND,RESET }
+    /**
+     * List of possible events that an observer can respond to
+     */
+    enum Event { LEFT,RIGHT,UP,DOWN,SETUP,UPDATE_BOARD,SET_STEPS,RESET,
+        UPDATE_ELIM,GATHER_CARDS,CHOOSE,GUESS,ACCUSE,SET_CHOSEN,CURRENT_PLAYER,ALL_CARDS}
 
+    /**
+     * Notify the observers of an event
+     */
     void notify(Event event);
 
+    /**
+     * Notify the Observer of an event, pass an Object that is required to
+     * complete action
+     */
     void notify(Object obj, Event event);
 
-    void notify(Map<String, String> collection, BufferedImage img, Subject.Event event);
+    /**
+     * Request for an object from an Observer
+     */
+    Object request(Event object);
 }

@@ -33,7 +33,7 @@ import swen225.murdermadness.view.*;
  * MurderMadness 
  * - Main class for all the logic in the game.
  */
-public class MurderMadness {
+public class MurderMadness implements Observer{
 	
 	private static List<String> characterNames = new ArrayList<String>(Arrays.asList("Lucilla", "Bert",
             "Melina", "Percy")); // this also indicates the order of turns
@@ -58,7 +58,7 @@ public class MurderMadness {
     public MurderMadness() {
     	isOngoing = true;
     	board = new Board(this);
-    	view = new GUI(this);
+    	view = new GUI(List.of(this));
     }
     
     /**
@@ -71,7 +71,7 @@ public class MurderMadness {
     	for (Entry<String, String> et: playerList.entrySet()) {
     		Player p = new Player(et.getKey(), et.getValue());
     		players.add(p);
-    		p.setImg(this.grabAsset("assets/player-"+p.getName().toLowerCase()+".png"));
+    		p.setImg(GrabAsset.grabAsset("assets/player-"+p.getName().toLowerCase()+".png"));
 			switch(et.getValue()){
 				case("Lucilla"):
 					p.setPos(new Position(11,1));
@@ -90,7 +90,6 @@ public class MurderMadness {
     	currentPlayer = 0;
     	initializeCards();
     	view.onPlayerTurn(players.get(currentPlayer));
-    	System.out.println(murderSolution);
     }
     
     /*
@@ -99,7 +98,7 @@ public class MurderMadness {
     public void updateBoard(Graphics2D g) {
     	board.show(g);
     }
-    
+
 
 	/**
 	 * Check if all players have had their turn for this round
@@ -165,6 +164,8 @@ public class MurderMadness {
     public void setPlayerSteps(int steps) {
     	players.get(currentPlayer).setStepsRemaining(steps);;
     }
+
+
 
 	public void reset(){
 		ArrayList<Player> newGame = new ArrayList<>();
@@ -405,31 +406,16 @@ public class MurderMadness {
     public List<Player> getPlayers() {
     	return Collections.unmodifiableList(this.players);
     }
-    
-    public BufferedImage grabAsset(String path) {
-		try {
-			BufferedImage img = ImageIO.read(new File(path));
-			return img;
-		} catch (Exception e) {e.printStackTrace();}
-		return null;
-    }
-    
-    /*
-     * Gets the current Player.
-     */
-    public Player getCurrentPlayer() {
-    	return players.get(currentPlayer);
-    }
-    
-    
-    /*
-     * Gets the current Player.
-     */
-    public Map<String, Card> getAllCards() {
-    	return allCards;
-    }
-    
-    // Small Implementation of a Pair Class
+
+	/*
+	 * Gets the current Player.
+	 */
+	public Map<String, Card> getAllCards() {
+		return allCards;
+	}
+
+
+	// Small Implementation of a Pair Class
     class Pair<K,V> {
     	private K a; 
     	private V b;
@@ -441,8 +427,66 @@ public class MurderMadness {
     	public V getRight() {return this.b;}
     }
 
+	@Override
+	public void update(Subject.Event event) {
+		switch(event){
+			case LEFT: onPlayerMove(Direction.LEFT); break;
+			case RIGHT: onPlayerMove(Direction.RIGHT); break;
+			case UP: onPlayerMove(Direction.UP); break;
+			case DOWN: onPlayerMove(Direction.DOWN); break;
+			case RESET: reset(); break;
+			case GATHER_CARDS: gatherPossibleCards(); break;
+			case CHOOSE: triggerChoose(); break;
+			case GUESS: onGuess(); break;
+			case ACCUSE: onAccuse(); break;
+			default:
+		}
+	}
 
-    
+	@Override
+	public void update(Object obj, Subject.Event event) {
+		if(obj instanceof Graphics2D){
+			switch(event){
+				case UPDATE_BOARD:
+					updateBoard((Graphics2D) obj);
+					break;
+				case UPDATE_ELIM:
+					break;
+			}
+		}
+		else if(obj instanceof Map){
+			switch(event){
+				case SETUP:
+					setup((Map<String,String>)obj);
+					break;
+			}
+		}
+		else if(obj instanceof Card){
+			switch(event){
+				case SET_CHOSEN:
+					setChosenCard((Card)obj);
+					break;
+			}
+		}
+		else if(obj instanceof Integer){
+			switch(event){
+				case SET_STEPS:
+					setPlayerSteps((Integer) obj);
+					break;
+			}
+		}
+	}
+
+	public Object retrieve(Subject.Event object){
+    	switch (object){
+			case CURRENT_PLAYER:
+				return this.players.get(currentPlayer);
+			case ALL_CARDS:
+				return getAllCards();
+		}
+		return null;
+	}
+
 	public static void main(String[] args) {
 		new MurderMadness();
 	}

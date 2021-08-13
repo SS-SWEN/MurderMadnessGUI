@@ -296,16 +296,13 @@ public class Board {
     			return false; 
     			}
     		if(next.isObstruction()) {
-    			System.out.println("There is a wall there!");
     			return false; 
     		}
     		if(player.getPrevPos().contains(next.getPos())) {
-    			System.out.println("This position has already been visited this turn!");
     			return false;
     		}
     		for(Player p  : model.getPlayers()){
     			if(p.getPos().equals(next.getPos())){
-					System.out.println("A character is already in this spot!");
     				return false;
 				}
 			}
@@ -324,8 +321,7 @@ public class Board {
 		this.board[pos.getX()][pos.getY()].setCharacter(board[p.getPos().getX()][p.getPos().getY()].getCharacter());
         this.board[p.getPos().getX()][p.getPos().getY()].setCharacter(".");
         p.updateLocation(pos);
-        
-        System.out.println(p.getName()+" has been moved to "+estate.getName());
+
     }
     
     /**

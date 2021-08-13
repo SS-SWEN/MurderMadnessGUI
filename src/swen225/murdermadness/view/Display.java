@@ -19,6 +19,5 @@ public final class Display {
 			display.append("  ");
 			display.append(possibleCards.get(i)).append(" ");
 		}
-		System.out.println("Possible Cards: \n"+display);
 	}
 }

@@ -1,18 +1,17 @@
 package swen225.murdermadness.gui;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import swen225.murdermadness.MurderMadness;
-import swen225.murdermadness.Player;
+import swen225.murdermadness.*;
+import swen225.murdermadness.Observer;
 import swen225.murdermadness.cards.Card;
 
 /**
@@ -21,9 +20,10 @@ import swen225.murdermadness.cards.Card;
  * a panel to display eliminations and a panel to display the user HUD. Finally a menu is added to the frame, which allows
  * the player to quit or start a new game.
  */
-public class GUI {
+public class GUI implements Subject {
 
-	private MurderMadness model;
+	private final List<Observer> observers;
+
 	private GameSetupFrame setupFrame;
 	private JFrame guessAccuse;
 
@@ -44,9 +44,9 @@ public class GUI {
 
 	private static Color BACKGROUND_COLOR = new Color(120, 116, 119);
 
-	public GUI(MurderMadness model) {
-		this.model = model;
-		setupFrame = new GameSetupFrame(model);
+	public GUI(List<Observer> observers) {
+		this.observers = observers;
+		setupFrame = new GameSetupFrame(observers);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class GUI {
 		guessAccuse.setLocationRelativeTo(null);
     	
     	// Action Buttons
-    	actionControl = new ActionPanel(model, this);
+    	actionControl = new ActionPanel(observers, this);
 
 		playerTurnLabel = new JLabel();
 		playerTurnLabel.setText("A Game of MurderMadness has Started!");
@@ -91,8 +91,7 @@ public class GUI {
     	drawing = new JPanel() {
     		@Override
     		public void paintComponent(Graphics g) {
-    			Graphics2D g2d = (Graphics2D) g;
-    			model.updateBoard(g2d);
+				GUI.this.notify((Graphics2D) g, Event.UPDATE_BOARD);
     		}
     	};
     	drawing.setPreferredSize(new Dimension(DFLT_DRAWING_WIDTH,DFLT_DRAWING_HEIGHT));
@@ -101,7 +100,7 @@ public class GUI {
     	userHUD = new JPanel() {
     		@Override
     		public void paintComponent(Graphics g) {
-    			Graphics2D g2d = (Graphics2D) g;
+
     		}
     	};
 
@@ -111,25 +110,24 @@ public class GUI {
     	innerPanel.setBottomComponent(userHUD);
 
     	// Right Panel Elimination Sheet Graphics Pane
-    	rightPanel = new JPanel() {
+		rightPanel = new JPanel() {
     		@Override
     		public void paintComponent(Graphics g) {
-    			Graphics2D g2d = (Graphics2D) g;
     		}
     	};
     	rightPanel.setBackground(BACKGROUND_COLOR);
-    	rightPanel.setLayout(new BorderLayout());
-    	JLabel eliminationLabel = new JLabel();
-    	eliminationLabel.setText("Elimination Sheet");
-    	eliminationLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-    	JLabel potentialLabel = new JLabel();
-    	potentialLabel.setText("Potential Sheet");
-    	potentialLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
-    	
-    	rightPanel.add(eliminationLabel, BorderLayout.NORTH);
-    	rightPanel.add(potentialLabel, BorderLayout.CENTER);
-  
+		rightPanel.setLayout(new BorderLayout());
+		JLabel eliminationLabel = new JLabel();
+		eliminationLabel.setText("Elimination Sheet");
+		eliminationLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+		JLabel potentialLabel = new JLabel();
+		potentialLabel.setText("Potential Sheet");
+		potentialLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+		rightPanel.add(eliminationLabel, BorderLayout.NORTH);
+		rightPanel.add(potentialLabel, BorderLayout.CENTER);
 
     	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     	split.setEnabled(false);
@@ -161,7 +159,7 @@ public class GUI {
    				int selection = JOptionPane.showOptionDialog(null, panel, "WARNING!", JOptionPane.DEFAULT_OPTION,
     					JOptionPane.WARNING_MESSAGE, null, options, options[1]);
    				if (selection == 0) {
-   					setupFrame = new GameSetupFrame(model);
+   					setupFrame = new GameSetupFrame(observers);
    					frame.dispose();
    				}
    			}
@@ -175,7 +173,7 @@ public class GUI {
 			int selection = JOptionPane.showOptionDialog(null, panel, "WARNING!", JOptionPane.DEFAULT_OPTION,
 					JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 			if (selection == 0) {
-				model.reset();
+				notify(Event.RESET);
 			}
 		});
 
@@ -211,7 +209,7 @@ public class GUI {
 			"assets/dice_5.png",
 			"assets/dice_6.png"));
 
-	
+
 	/*
 	 * Rolls the dice
 	 */
@@ -227,7 +225,7 @@ public class GUI {
 		int x = 0;
 		for(int i = 0; i<200;i++) {
 			x = i%6;
-			img3 = model.grabAsset(dicePicPath.get(x));
+			img3 = GrabAsset.grabAsset(dicePicPath.get(x));
 			g.clearRect(0, 0, userHUD.getWidth(), userHUD.getHeight());
 			g.drawImage(img3, 0, 0, 100, 100, null);
 			g.drawImage(img3, 100, 0, 100, 100, null);
@@ -235,44 +233,44 @@ public class GUI {
 		}
 		switch(roll1) {
 			case 1:
-				img1 = model.grabAsset("assets/dice_1.png");
+				img1 = GrabAsset.grabAsset("assets/dice_1.png");
 				break;
 			case 2:
-				img1 = model.grabAsset("assets/dice_2.png");
+				img1 = GrabAsset.grabAsset("assets/dice_2.png");
 				break;
 			case 3:
-				img1 = model.grabAsset("assets/dice_3.png");
+				img1 = GrabAsset.grabAsset("assets/dice_3.png");
 				break;
 			case 4:
-				img1 = model.grabAsset("assets/dice_4.png");
+				img1 = GrabAsset.grabAsset("assets/dice_4.png");
 				break;
 			case 5:
-				img1 = model.grabAsset("assets/dice_5.png");
+				img1 = GrabAsset.grabAsset("assets/dice_5.png");
 				break;
 			case 6:
-				img1 = model.grabAsset("assets/dice_6.png");
+				img1 = GrabAsset.grabAsset("assets/dice_6.png");
 				break;
 			default:
 				// code block
 		}
 		switch(roll2) {
 			case 1:
-				img2 = model.grabAsset("assets/dice_1.png");
+				img2 = GrabAsset.grabAsset("assets/dice_1.png");
 				break;
 			case 2:
-				img2 = model.grabAsset("assets/dice_2.png");
+				img2 = GrabAsset.grabAsset("assets/dice_2.png");
 				break;
 			case 3:
-				img2 = model.grabAsset("assets/dice_3.png");
+				img2 = GrabAsset.grabAsset("assets/dice_3.png");
 				break;
 			case 4:
-				img2 = model.grabAsset("assets/dice_4.png");
+				img2 = GrabAsset.grabAsset("assets/dice_4.png");
 				break;
 			case 5:
-				img2 = model.grabAsset("assets/dice_5.png");
+				img2 = GrabAsset.grabAsset("assets/dice_5.png");
 				break;
 			case 6:
-				img2 = model.grabAsset("assets/dice_6.png");
+				img2 = GrabAsset.grabAsset("assets/dice_6.png");
 				break;
 			default:
 		}
@@ -285,7 +283,9 @@ public class GUI {
 		Font font = new Font("Helvetica", Font.BOLD, 15);
 		g.setFont(font);
 		g.drawString("Rolled "+((int)roll1+(int)roll2), 220, 50);
-		model.setPlayerSteps(roll1+roll2);
+
+		notify(roll1+roll2, Event.SET_STEPS);
+
 		actionControl.setMove(true);
 		actionControl.setRoll(false);
 	}
@@ -295,7 +295,7 @@ public class GUI {
      */
     public void onPlayerTurn(Player p) {
 		userHUD.getGraphics().clearRect(0,0, userHUD.getWidth(), userHUD.getHeight());
-		
+
 		String[] options = {"Continue"};
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel("It is currently "+p.getUsername()+"'s Turn as "+p.getName());
@@ -335,14 +335,16 @@ public class GUI {
     	if (selection == 0) {
     		setStatus("You are currently Refuting");
     		setMode("Guess");
-    		model.gatherPossibleCards();
-    		model.triggerChoose();
+			notify(Event.GATHER_CARDS);
+			notify(Event.CHOOSE);
+
     		return false;
     	} else if (selection == 1) {
     		setStatus("You are currently Accusing");
     		setMode("Accuse");
-    		model.gatherPossibleCards();
-    		model.triggerChoose();
+			notify(Event.GATHER_CARDS);
+			notify(Event.CHOOSE);
+
     		return false;
     	}
     	return true;
@@ -351,9 +353,9 @@ public class GUI {
 
     public void checkLogic() {
     	if (guessAccuse.getTitle().equals("Guess")) {
-    		model.onGuess();
+			notify(Event.GUESS);
     	} else if (guessAccuse.getTitle().equals("Accuse")) {
-    		model.onAccuse();
+			notify(Event.ACCUSE);
     	}
     }
 
@@ -380,9 +382,9 @@ public class GUI {
 			    	int selection = JOptionPane.showOptionDialog(null, panel, "Confirm Decision", JOptionPane.DEFAULT_OPTION, 
 			    	JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 			    	if (selection == 0) {
-			    		model.setChosenCard(c);
+						GUI.this.notify(c, Event.SET_CHOSEN);
 						guessAccuse.setVisible(false);
-			    		model.triggerChoose();
+						GUI.this.notify(Event.CHOOSE);
 			    	} else return;
 				}
 			});
@@ -405,61 +407,62 @@ public class GUI {
     public void showHand() {
     	Graphics2D g = (Graphics2D)this.userHUD.getGraphics();
     	g.clearRect(0, 0, userHUD.getWidth(), userHUD.getHeight()); // Clears the panel before drawing
-    	Player p = model.getCurrentPlayer();
+		Player p = (Player)request(Event.CURRENT_PLAYER);
     	List<Card> hand = p.getHand();
     	int padding = 50;
-    	
+
     	// Start drawing
     	for (Card c : hand) {
     		g.drawImage(c.getCardImage(), padding, 0, 100, 100, null);
     		padding += 110;
     	}
     }
-    
-    /*
-     * Shows the elimination cards of the current player, this includes their own hand.
-     */
-    
-    public void showElimination() {
-    	Graphics2D g = (Graphics2D)this.rightPanel.getGraphics();
-    	g.clearRect(0, 20, rightPanel.getWidth(), rightPanel.getHeight()/2-50); // Clears the panel before drawing
-    	Player p = model.getCurrentPlayer();
-    	Set<Card> eliminations = p.getEliminations();
-    	int paddingX = 1;
-    	int paddingY = 30;
-    	int gap = 5;
-    	for (Card c : eliminations) {
-    		if (paddingX + gap > this.rightPanel.getWidth()) {
-    			paddingX = 1;
-    			paddingY += 55;
-    		}
-    		g.drawImage(c.getCardImage(), paddingX, paddingY, 50, 50, null); 
-    		paddingX += 60;
-    	}
-    }
-    
-    public void showPotential() {
-    	Graphics2D g = (Graphics2D)this.rightPanel.getGraphics();
-    	g.clearRect(0,  rightPanel.getHeight()/2+50, rightPanel.getWidth(), rightPanel.getHeight()); // Clears the panel before drawing
-    	Player p = model.getCurrentPlayer();
-    	Set<Card> eliminations = p.getEliminations();
-    	int paddingX = 1;
-    	int paddingY = rightPanel.getHeight()/2+30;
-    	int gap = 5;
-    
-    	
-    	for (Card c : model.getAllCards().values()) {
-    		if (!eliminations.contains(c)) {
-	    		if (paddingX + gap > this.rightPanel.getWidth()) {
-	    			paddingX = 1;
-	    			paddingY += 55;
-	    		}
-    		g.drawImage(c.getCardImage(), paddingX, paddingY, 50, 50, null); 
-    		paddingX += 60;
-    		}
-    	}
-    }
-    
+
+	/*
+	 * Shows the elimination cards of the current player, this includes their own hand.
+	 */
+	public void showElimination() {
+		Graphics2D g = (Graphics2D)this.rightPanel.getGraphics();
+		g.clearRect(0, 20, rightPanel.getWidth(), rightPanel.getHeight()/2-50); // Clears the panel before drawing
+
+		Player p = (Player)request(Event.CURRENT_PLAYER);
+
+		Set<Card> eliminations = p.getEliminations();
+		int paddingX = 1;
+		int paddingY = 30;
+		int gap = 5;
+		for (Card c : eliminations) {
+			if (paddingX + gap > this.rightPanel.getWidth()) {
+				paddingX = 1;
+				paddingY += 55;
+			}
+			g.drawImage(c.getCardImage(), paddingX, paddingY, 50, 50, null);
+			paddingX += 60;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void showPotential() {
+		Graphics2D g = (Graphics2D)this.rightPanel.getGraphics();
+		g.clearRect(0,  rightPanel.getHeight()/2+50, rightPanel.getWidth(), rightPanel.getHeight()); // Clears the panel before drawing
+		Player p = (Player)request(Event.CURRENT_PLAYER);
+		Set<Card> eliminations = p.getEliminations();
+		int paddingX = 1;
+		int paddingY = rightPanel.getHeight()/2+30;
+		int gap = 5;
+
+		for(Card c : ((Map<String, Card>)request(Event.ALL_CARDS)).values()) {
+			if (!eliminations.contains(c)) {
+				if (paddingX + gap > this.rightPanel.getWidth()) {
+					paddingX = 1;
+					paddingY += 55;
+				}
+				g.drawImage(c.getCardImage(), paddingX, paddingY, 50, 50, null);
+				paddingX += 60;
+			}
+		}
+	}
+
     /*
      * Get drawing pane of the main GUI;
      */
@@ -472,5 +475,26 @@ public class GUI {
     	actionControl.setRoll(false);
     	actionControl.setMove(false);
     }
-    
+
+	@Override
+	public void notify(Event event) {
+		for(Observer o : observers){
+			o.update(event);
+		}
+	}
+
+	@Override
+	public void notify(Object obj, Event event) {
+		for(Observer o : observers){
+			o.update(obj,event);
+		}
+	}
+
+	public Object request(Event object){
+    	for(Observer o : observers){
+    		Object retrieved = o.retrieve(object);
+    		if(retrieved != null){ return retrieved; }
+		}
+    	return null;
+	}
 }
